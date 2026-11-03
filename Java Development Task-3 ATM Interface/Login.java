@@ -55,7 +55,9 @@ public class Login {
 
         System.out.println("\nOpening ATM interface...");
 
-        // The actual ATM interface will be implemented in the next phase.
+        // Proceed to the ATM interface
+        AtmIndex atmIndex = new AtmIndex(new java.util.Scanner(System.in));
+        atmIndex.displayMenu();
     }
 
     private static String authenticateUserId(Console console) {
