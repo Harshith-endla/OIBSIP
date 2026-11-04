@@ -2,6 +2,7 @@
 import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Login {
 
@@ -20,11 +21,11 @@ public class Login {
 
         Console console = System.console();
 
-        /*if (console == null) {
+        if (console == null) {
             System.out.println("Console input is unavailable.");
-            System.out.println("Please run this program using a terminal.");
+            System.out.println("Please run this program using Command Prompt or PowerShell.");
             return;
-        }*/
+        }
 
         System.out.println("================================");
         System.out.println("          ATM LOGIN");
@@ -35,7 +36,6 @@ public class Login {
         if (userId == null) {
             System.out.println("Maximum User ID attempts reached.");
             System.out.println("Login terminated.");
-            System.out.println("Please come back after few minutes.");
             return;
         }
 
@@ -44,7 +44,6 @@ public class Login {
         if (!authenticated) {
             System.out.println("Maximum PIN attempts reached.");
             System.out.println("Login terminated.");
-            System.out.println("Please come back after few minutes.");
             return;
         }
 
@@ -55,8 +54,8 @@ public class Login {
 
         System.out.println("\nOpening ATM interface...");
 
-        // Proceed to the ATM interface
-        AtmIndex atmIndex = new AtmIndex(new java.util.Scanner(System.in));
+        Scanner scanner = new Scanner(System.in);
+        AtmIndex atmIndex = new AtmIndex(scanner);
         atmIndex.displayMenu();
     }
 
@@ -68,11 +67,11 @@ public class Login {
 
             if (!userId.matches("^[A-Za-z]{4}[0-9]{3}$")) {
                 System.out.println("Invalid User ID format. Example: USER001");
-            } else if (!registeredUsers.containsKey(userId)) {
+            } else if (!registeredUsers.containsKey(userId.toUpperCase())) {
                 System.out.println("User ID is not registered.");
             } else {
                 System.out.println("User ID verified successfully.");
-                return userId;
+                return userId.toUpperCase();
             }
 
             System.out.println("Attempts remaining: " + (MAX_ATTEMPTS - attempt));
@@ -90,6 +89,7 @@ public class Login {
             char[] enteredPin = console.readPassword("Enter 4-digit PIN: ");
 
             String pin = new String(enteredPin);
+            java.util.Arrays.fill(enteredPin, ' ');
 
             if (!pin.matches("^[0-9]{4}$")) {
                 System.out.println("Invalid PIN. Enter exactly 4 digits.");
