@@ -55,8 +55,8 @@ public class Login {
         System.out.println("\nOpening ATM interface...");
 
         Scanner scanner = new Scanner(System.in);
-        AtmIndex atmIndex = new AtmIndex(scanner);
-        atmIndex.displayMenu();
+        Atm atm = new Atm(scanner);
+        atm.displayMenu();
     }
 
     private static String authenticateUserId(Console console) {
