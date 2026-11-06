@@ -31,7 +31,7 @@ public class Withdraw {
             System.out.println("\n================================");
             System.out.println("          CASH WITHDRAWAL");
             System.out.println("================================");
-            System.out.println("Available Balance: ₹" + balance);
+            System.out.println("Available Balance: Rs " + balance);
 
             BigDecimal amount = getWithdrawalAmount();
 
@@ -40,7 +40,7 @@ public class Withdraw {
             }
 
             while (true) {
-                System.out.print("\nConfirm withdrawal of ₹" + amount + "? (Y/N): ");
+                System.out.print("\nConfirm withdrawal of Rs " + amount + "? (Y/N): ");
 
                 if (!scanner.hasNextLine()) {
                     return balance;
@@ -88,7 +88,7 @@ public class Withdraw {
 
         while (true) {
 
-            System.out.print("\nEnter withdrawal amount (₹): ");
+            System.out.print("\nEnter withdrawal amount (Rs): ");
 
             if (!scanner.hasNextLine()) {
                 return null;
@@ -108,15 +108,15 @@ public class Withdraw {
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 System.out.println("Amount must be greater than zero.");
             } else if (amount.compareTo(MIN_AMOUNT) < 0) {
-                System.out.println("Minimum withdrawal amount is ₹100.");
+                System.out.println("Minimum withdrawal amount is Rs 100.");
             } else if (amount.compareTo(balance) > 0) {
                 System.out.println("Insufficient account balance.");
-                System.out.println("Available balance: ₹" + balance);
+                System.out.println("Available balance: Rs " + balance);
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
-                System.out.println("Maximum withdrawal amount is ₹25,000.");
+                System.out.println("Maximum withdrawal amount is Rs 25,000.");
             } else if (amount.remainder(DENOMINATION)
                     .compareTo(BigDecimal.ZERO) != 0) {
-                System.out.println("Withdrawal amount must be in multiples of ₹100.");
+                System.out.println("Withdrawal amount must be in multiples of Rs 100.");
             } else {
                 return amount;
             }
@@ -132,10 +132,10 @@ public class Withdraw {
         System.out.println("       WITHDRAWAL RECEIPT");
         System.out.println("================================");
         System.out.println("Transaction : Cash Withdrawal");
-        System.out.println("Amount      : ₹" + amount);
+        System.out.println("Amount      : Rs " + amount);
         System.out.println("Date & Time : "
                 + LocalDateTime.now().format(formatter));
-        System.out.println("Remaining   : ₹" + balance);
+        System.out.println("Remaining   : Rs " + balance);
         System.out.println("================================");
         System.out.println("Please collect your cash.");
         System.out.println("Thank you!");
@@ -151,7 +151,7 @@ public class Withdraw {
 
     BigDecimal updatedBalance = withdraw.startWithdrawal();
 
-    System.out.println("\nFinal Account Balance: ₹" + updatedBalance);
+    System.out.println("\nFinal Account Balance: Rs " + updatedBalance);
 }
 
 }
