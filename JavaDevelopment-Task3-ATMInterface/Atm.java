@@ -4,9 +4,11 @@ import java.util.Scanner;
 public class Atm {
 
     private final Scanner scanner;
+    private final String userId;
     private BigDecimal balance = new BigDecimal("50000");
 
-    public static void main(String[] args) {
+   /*
+   public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Atm atm = new Atm(scanner);
 
@@ -16,9 +18,11 @@ public class Atm {
             scanner.close();
         }
     }
+         */ 
 
-    public Atm(Scanner scanner) {
+    public Atm(Scanner scanner, String userId) {
         this.scanner = scanner;
+        this.userId = userId;
     }
 
     public void displayMenu() {
@@ -51,17 +55,23 @@ public class Atm {
 
                 case "2":
                     System.out.println("\nOpening Deposit page...");
-                    System.out.println("Deposit page will be implemented in the next phase.");
+                    Deposit deposit = new Deposit(scanner, balance);
+                    balance = deposit.startDeposit();
+
                     break;
 
                 case "3":
                     System.out.println("\nOpening Balance page...");
-                    System.out.println("Balance page will be implemented in the next phase.");
+                    Balance balancePage = new Balance(scanner, balance);
+                    balancePage.displayBalance();
+
                     break;
 
                 case "4":
                     System.out.println("\nOpening Enquire page...");
-                    System.out.println("Enquire page will be implemented in its phase.");
+                    Enquire enquire = new Enquire(scanner, userId, balance);
+                    enquire.displayEnquiry();;
+
                     break;
 
                 case "0":

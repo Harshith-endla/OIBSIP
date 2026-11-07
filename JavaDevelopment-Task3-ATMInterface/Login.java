@@ -1,4 +1,3 @@
-
 import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class Login {
         System.out.println("\nOpening ATM interface...");
 
         Scanner scanner = new Scanner(System.in);
-        Atm atm = new Atm(scanner);
+        Atm atm = new Atm(scanner, userId);
         atm.displayMenu();
     }
 
