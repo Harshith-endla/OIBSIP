@@ -6,19 +6,7 @@ public class Atm {
     private final Scanner scanner;
     private final String userId;
     private BigDecimal balance = new BigDecimal("50000");
-
-   /*
-   public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Atm atm = new Atm(scanner);
-
-        try {
-            atm.displayMenu();
-        } finally {
-            scanner.close();
-        }
-    }
-         */ 
+ 
 
     public Atm(Scanner scanner, String userId) {
         this.scanner = scanner;
