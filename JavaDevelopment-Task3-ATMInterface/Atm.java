@@ -6,7 +6,6 @@ public class Atm {
     private final Scanner scanner;
     private final String userId;
     private BigDecimal balance = new BigDecimal("50000");
- 
 
     public Atm(Scanner scanner, String userId) {
         this.scanner = scanner;
@@ -56,9 +55,10 @@ public class Atm {
                     break;
 
                 case "4":
-                    System.out.println("\nOpening Enquire page...");
+                    System.out.println("\nOpening Enquire page....");
                     Enquire enquire = new Enquire(scanner, userId, balance);
-                    enquire.displayEnquiry();;
+                    enquire.displayEnquiry();
+                    ;
 
                     break;
 
