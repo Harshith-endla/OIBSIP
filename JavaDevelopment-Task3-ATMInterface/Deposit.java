@@ -7,14 +7,11 @@ import java.util.Scanner;
 
 public class Deposit {
 
-    private static final BigDecimal MIN_AMOUNT =
-            new BigDecimal("100");
+    private static final BigDecimal MIN_AMOUNT = new BigDecimal("100");
 
-    private static final BigDecimal MAX_AMOUNT =
-            new BigDecimal("50000");
+    private static final BigDecimal MAX_AMOUNT = new BigDecimal("50000");
 
-    private static final BigDecimal DENOMINATION =
-            new BigDecimal("100");
+    private static final BigDecimal DENOMINATION = new BigDecimal("100");
 
     private final Scanner scanner;
     private BigDecimal balance;
@@ -23,10 +20,9 @@ public class Deposit {
     public Deposit(Scanner scanner, BigDecimal currentBalance) {
 
         if (scanner == null || currentBalance == null
-            || currentBalance.compareTo(BigDecimal.ZERO) < 0) {
+                || currentBalance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(
-            "Invalid deposit details."
-            );
+                    "Invalid deposit details.");
         }
 
         this.scanner = scanner;
@@ -42,7 +38,7 @@ public class Deposit {
             System.out.println("          CASH DEPOSIT");
             System.out.println("================================");
             System.out.println("Available Balance: Rs "
-            + formatAmount(balance));
+                    + formatAmount(balance));
 
             BigDecimal amount = getDepositAmount();
 
@@ -78,8 +74,7 @@ public class Deposit {
                     return balance;
                 } else {
                     System.out.println(
-                    "Invalid choice. Please select 1 or 2."
-                    );
+                            "Invalid choice. Please select 1 or 2.");
                 }
             }
         }
@@ -96,8 +91,7 @@ public class Deposit {
 
             if (!input.matches("[0-9]+")) {
                 System.out.println(
-                "Invalid amount. Enter whole numbers only."
-                );
+                        "Invalid amount. Enter whole numbers only.");
                 continue;
             }
 
@@ -106,21 +100,18 @@ public class Deposit {
             if (amount.compareTo(MIN_AMOUNT) < 0) {
 
                 System.out.println(
-                "Minimum deposit amount is Rs 100."
-                );
+                        "Minimum deposit amount is Rs 100.");
 
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
 
                 System.out.println(
-                "Maximum deposit amount is Rs 50,000."
-                );
+                        "Maximum deposit amount is Rs 50,000.");
 
             } else if (amount.remainder(DENOMINATION)
                     .compareTo(BigDecimal.ZERO) != 0) {
 
                 System.out.println(
-                "Deposit amount must be in multiples of Rs 100."
-                );
+                        "Deposit amount must be in multiples of Rs 100.");
 
             } else {
 
@@ -135,9 +126,8 @@ public class Deposit {
         while (true) {
 
             System.out.print(
-            "\nConfirm deposit of Rs "
-            + formatAmount(amount) + "? (Y/N): "
-            );
+                    "\nConfirm deposit of Rs "
+                            + formatAmount(amount) + "? (Y/N): ");
 
             String confirmation = scanner.nextLine().trim();
 
@@ -147,8 +137,7 @@ public class Deposit {
                 return false;
             } else {
                 System.out.println(
-                "Invalid confirmation. Please enter Y or N."
-                );
+                        "Invalid confirmation. Please enter Y or N.");
             }
         }
     }
@@ -158,23 +147,21 @@ public class Deposit {
             BigDecimal previousBalance,
             BigDecimal amount) {
 
-        DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern(
-            "dd-MM-yyyy HH:mm:ss"
-            );
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                "dd-MM-yyyy HH:mm:ss");
 
         System.out.println("\n================================");
         System.out.println("         DEPOSIT RECEIPT");
         System.out.println("================================");
         System.out.println("Transaction      : Cash Deposit");
         System.out.println("Previous Balance : Rs "
-        + formatAmount(previousBalance));
+                + formatAmount(previousBalance));
         System.out.println("Deposit Amount   : Rs "
-        + formatAmount(amount));
+                + formatAmount(amount));
         System.out.println("New Balance      : Rs "
-        + formatAmount(balance));
+                + formatAmount(balance));
         System.out.println("Date & Time      : "
-        + LocalDateTime.now().format(formatter));
+                + LocalDateTime.now().format(formatter));
         System.out.println("================================");
         System.out.println("       DEPOSIT SUCCESSFUL");
         System.out.println("================================");
@@ -186,16 +173,4 @@ public class Deposit {
         return String.format(Locale.US, "%,.2f", amount);
     }
 
-    public static void main(String[] args) {
-
-    Scanner scanner = new Scanner(System.in);
-
-    BigDecimal openingBalance = new BigDecimal("50000");
-
-    Deposit deposit = new Deposit(scanner, openingBalance);
-
-    deposit.startDeposit();
-
-    scanner.close();
-}
 }
