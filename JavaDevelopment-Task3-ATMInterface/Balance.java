@@ -58,16 +58,4 @@ public class Balance {
         return String.format(Locale.US, "%,.2f", amount);
     }
 
-    public static void main(String[] args) {
-
-    Scanner scanner = new Scanner(System.in);
-
-    BigDecimal testBalance = new BigDecimal("50000");
-
-    Balance balance = new Balance(scanner, testBalance);
-
-    balance.displayBalance();
-
-    scanner.close();
-}
 }
