@@ -1,4 +1,3 @@
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -125,8 +124,7 @@ public class Withdraw {
 
     private void displayReceipt(BigDecimal amount) {
 
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
         System.out.println("\n================================");
         System.out.println("       WITHDRAWAL RECEIPT");
@@ -140,18 +138,5 @@ public class Withdraw {
         System.out.println("Please collect your cash.");
         System.out.println("Thank you!");
     }
-
-    public static void main(String[] args) {
-
-    Scanner scanner = new Scanner(System.in);
-
-    BigDecimal openingBalance = new BigDecimal("50000");
-
-    Withdraw withdraw = new Withdraw(scanner, openingBalance);
-
-    BigDecimal updatedBalance = withdraw.startWithdrawal();
-
-    System.out.println("\nFinal Account Balance: Rs " + updatedBalance);
-}
 
 }
