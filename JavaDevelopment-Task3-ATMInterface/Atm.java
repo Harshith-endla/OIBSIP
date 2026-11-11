@@ -1,15 +1,17 @@
-import java.math.BigDecimal;
+
 import java.util.Scanner;
 
 public class Atm {
 
     private final Scanner scanner;
-    private final String userId;
-    private BigDecimal balance = new BigDecimal("50000");
+    private final Account account;
+    private final Bank bank;
 
-    public Atm(Scanner scanner, String userId) {
+    public Atm(Scanner scanner, Account account, Bank bank) {
+
         this.scanner = scanner;
-        this.userId = userId;
+        this.account = account;
+        this.bank = bank;
     }
 
     public void displayMenu() {
@@ -19,56 +21,84 @@ public class Atm {
         while (running) {
 
             System.out.println("\n================================");
-            System.out.println("          ATM SERVICES");
+            System.out.println("           ATM MENU");
             System.out.println("================================");
-            System.out.println("1. Withdraw");
-            System.out.println("2. Deposit");
-            System.out.println("3. Balance");
-            System.out.println("4. Enquire");
-            System.out.println("0. Exit");
+            System.out.println("Welcome, " + account.getAccountId());
+            System.out.println("1. Transaction History");
+            System.out.println("2. Withdraw");
+            System.out.println("3. Deposit");
+            System.out.println("4. Transfer");
+            System.out.println("5. Quit");
             System.out.println("================================");
 
             System.out.print("Enter your choice: ");
+
+            if (!scanner.hasNextLine()) {
+                break;
+            }
+
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
 
                 case "1":
-                    System.out.println("\nOpening Withdraw page...");
-                    Withdraw withdraw = new Withdraw(scanner, balance);
-                    balance = withdraw.startWithdrawal();
+
+                    System.out.println("\n================================");
+                    System.out.println("       TRANSACTION HISTORY");
+                    System.out.println("================================");
+
+                    account.getTransactionHistory().displayHistory();
 
                     break;
 
                 case "2":
-                    System.out.println("\nOpening Deposit page...");
-                    Deposit deposit = new Deposit(scanner, balance);
-                    balance = deposit.startDeposit();
+
+                    Withdraw withdraw = new Withdraw(
+                            scanner,
+                            account.getBalance(),
+                            account.getTransactionHistory());
+
+                    account.setBalance(
+                            withdraw.startWithdrawal());
 
                     break;
 
                 case "3":
-                    System.out.println("\nOpening Balance page...");
-                    Balance balancePage = new Balance(scanner, balance);
-                    balancePage.displayBalance();
+
+                    Deposit deposit = new Deposit(
+                            scanner,
+                            account.getBalance(),
+                            account.getTransactionHistory());
+
+                    account.setBalance(
+                            deposit.startDeposit());
 
                     break;
 
                 case "4":
-                    System.out.println("\nOpening Enquire page....");
-                    Enquire enquire = new Enquire(scanner, userId, balance);
-                    enquire.displayEnquiry();
-                    ;
+
+                    Transfer transfer = new Transfer(
+                            scanner,
+                            account,
+                            bank);
+
+                    transfer.startTransfer();
 
                     break;
 
-                case "0":
-                    System.out.println("\nThank you for using our ATM service.");
+                case "5":
+
+                    System.out.println("\nThank you for using our ATM.");
+                    System.out.println("Have a nice day!");
+
                     running = false;
+
                     break;
 
                 default:
-                    System.out.println("\nInvalid option. Please select 0, 1, 2, 3 or 4.");
+
+                    System.out.println(
+                            "\nInvalid choice. Please select 1 to 5.");
             }
         }
     }
