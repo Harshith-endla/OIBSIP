@@ -1,38 +1,47 @@
 
-import java.io.Console;
 import java.util.Scanner;
+import java.io.Console;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Console console = System.console();
-
-        if (console == null) {
-            System.out.println("Console input is unavailable.");
-            System.out.println("Please run this program using Command Prompt or PowerShell.");
-            return;
-        }
-
         Scanner scanner = new Scanner(System.in);
 
+        // Create the user repository.
         UserRepository userRepository = new UserRepository();
 
-        AuthenticationService authenticationService =
-                new AuthenticationService(userRepository);
+        // Create the authentication service.
+        AuthenticationService authenticationService = new AuthenticationService(userRepository);
 
+        // Create the bank.
+        Bank bank = new Bank();
+
+        // Get the system console for secure PIN input.
+        Console console = System.console();
+
+        // Authenticate the user.
         String authenticatedUser = authenticationService.login(console);
 
         if (authenticatedUser == null) {
+
+            System.out.println("\nAccess denied. Exiting ATM.");
             scanner.close();
             return;
         }
 
-        console.readLine("\nPress Enter to continue to the ATM interface...");
+        // Find the authenticated user's account.
+        Account account = bank.findAccount(authenticatedUser);
 
-        System.out.println("\nOpening ATM interface...");
+        if (account == null) {
 
-        Atm atm = new Atm(scanner, authenticatedUser);
+            System.out.println("\nAccount not found. Contact the bank.");
+            scanner.close();
+            return;
+        }
+
+        // Start the ATM application.
+        Atm atm = new Atm(scanner, account, bank);
 
         atm.displayMenu();
 
