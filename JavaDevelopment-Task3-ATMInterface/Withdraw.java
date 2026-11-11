@@ -10,19 +10,29 @@ public class Withdraw {
     private static final BigDecimal DENOMINATION = new BigDecimal("100");
 
     private final Scanner scanner;
+    private final TransactionHistory transactionHistory;
     private BigDecimal balance;
 
-    public Withdraw(Scanner scanner, BigDecimal currentBalance) {
+    // Constructor
+    public Withdraw(
+            Scanner scanner,
+            BigDecimal currentBalance,
+            TransactionHistory transactionHistory) {
 
         if (scanner == null || currentBalance == null
-                || currentBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Invalid withdrawal details.");
+                || currentBalance.compareTo(BigDecimal.ZERO) < 0
+                || transactionHistory == null) {
+
+            throw new IllegalArgumentException(
+                    "Invalid withdrawal details.");
         }
 
         this.scanner = scanner;
         this.balance = currentBalance;
+        this.transactionHistory = transactionHistory;
     }
 
+    // Starts the withdrawal process
     public BigDecimal startWithdrawal() {
 
         while (true) {
@@ -39,7 +49,9 @@ public class Withdraw {
             }
 
             while (true) {
-                System.out.print("\nConfirm withdrawal of Rs " + amount + "? (Y/N): ");
+
+                System.out.print(
+                        "\nConfirm withdrawal of Rs " + amount + "? (Y/N): ");
 
                 if (!scanner.hasNextLine()) {
                     return balance;
@@ -48,11 +60,25 @@ public class Withdraw {
                 String confirmation = scanner.nextLine().trim();
 
                 if (confirmation.equalsIgnoreCase("Y")) {
+
+                    // Deduct the withdrawal amount
                     balance = balance.subtract(amount);
-                    displayReceipt(amount);
+
+                    // Create and record the transaction
+                    Transaction transaction = new Transaction(
+                            Transaction.TransactionType.WITHDRAWAL,
+                            amount,
+                            "Cash Withdrawal");
+
+                    transactionHistory.addTransaction(transaction);
+
+                    // Display withdrawal receipt
+                    displayReceipt(amount, transaction.getDateTime());
 
                     while (true) {
-                        System.out.println("\nWould you like to withdraw again?");
+
+                        System.out.println(
+                                "\nWould you like to withdraw again?");
                         System.out.println("1. Yes, withdraw again");
                         System.out.println("2. No, return to ATM menu");
                         System.out.print("Enter your choice: ");
@@ -68,21 +94,28 @@ public class Withdraw {
                         } else if (choice.equals("2")) {
                             return balance;
                         } else {
-                            System.out.println("Invalid choice. Please select 1 or 2.");
+                            System.out.println(
+                                    "Invalid choice. Please select 1 or 2.");
                         }
                     }
 
                     break;
+
                 } else if (confirmation.equalsIgnoreCase("N")) {
+
                     System.out.println("\nWithdrawal cancelled.");
                     return balance;
+
                 } else {
-                    System.out.println("Invalid confirmation. Please enter Y or N.");
+
+                    System.out.println(
+                            "Invalid confirmation. Please enter Y or N.");
                 }
             }
         }
     }
 
+    // Validates the withdrawal amount
     private BigDecimal getWithdrawalAmount() {
 
         while (true) {
@@ -99,30 +132,51 @@ public class Withdraw {
 
             try {
                 amount = new BigDecimal(input);
+
             } catch (NumberFormatException e) {
-                System.out.println("Invalid amount. Please enter a numeric value.");
+
+                System.out.println(
+                        "Invalid amount. Please enter a numeric value.");
                 continue;
             }
 
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                System.out.println("Amount must be greater than zero.");
+
+                System.out.println(
+                        "Amount must be greater than zero.");
+
             } else if (amount.compareTo(MIN_AMOUNT) < 0) {
-                System.out.println("Minimum withdrawal amount is Rs 100.");
+
+                System.out.println(
+                        "Minimum withdrawal amount is Rs 100.");
+
             } else if (amount.compareTo(balance) > 0) {
-                System.out.println("Insufficient account balance.");
+
+                System.out.println("Insufficient Funds");
                 System.out.println("Available balance: Rs " + balance);
+
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
-                System.out.println("Maximum withdrawal amount is Rs 25,000.");
+
+                System.out.println(
+                        "Maximum withdrawal amount is Rs 25,000.");
+
             } else if (amount.remainder(DENOMINATION)
                     .compareTo(BigDecimal.ZERO) != 0) {
-                System.out.println("Withdrawal amount must be in multiples of Rs 100.");
+
+                System.out.println(
+                        "Withdrawal amount must be in multiples of Rs 100.");
+
             } else {
+
                 return amount;
             }
         }
     }
 
-    private void displayReceipt(BigDecimal amount) {
+    // Displays the withdrawal receipt
+    private void displayReceipt(
+            BigDecimal amount,
+            LocalDateTime transactionDateTime) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
@@ -132,11 +186,10 @@ public class Withdraw {
         System.out.println("Transaction : Cash Withdrawal");
         System.out.println("Amount      : Rs " + amount);
         System.out.println("Date & Time : "
-                + LocalDateTime.now().format(formatter));
+                + transactionDateTime.format(formatter));
         System.out.println("Remaining   : Rs " + balance);
         System.out.println("================================");
         System.out.println("Please collect your cash.");
         System.out.println("Thank you!");
     }
-
 }
