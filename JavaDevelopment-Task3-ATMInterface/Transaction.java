@@ -10,6 +10,17 @@ public class Transaction {
         TRANSFER
     }
 
+    // Centralized transaction descriptions
+    public static final class Descriptions {
+
+        public static final String WITHDRAWAL = "Cash Withdrawal";
+        public static final String DEPOSIT = "Cash Deposit";
+
+        private Descriptions() {
+            // Prevent object creation
+        }
+    }
+
     // Encapsulated transaction details
     private final TransactionType type;
     private final BigDecimal amount;

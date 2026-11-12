@@ -9,12 +9,16 @@ public class Account {
 
     public Account(String accountId, BigDecimal openingBalance) {
 
-        if (accountId == null || accountId.trim().isEmpty()
-                || openingBalance == null
-                || openingBalance.compareTo(BigDecimal.ZERO) < 0) {
-
+        // Validate account ID.
+        if (accountId == null || accountId.trim().isEmpty()) {
             throw new IllegalArgumentException(
-                    "Invalid account details.");
+                    "Invalid account ID.");
+        }
+
+        // Validate opening balance.
+        if (!isValidBalance(openingBalance)) {
+            throw new IllegalArgumentException(
+                    "Invalid opening balance.");
         }
 
         this.accountId = accountId.trim().toUpperCase();
@@ -36,9 +40,7 @@ public class Account {
 
     public void setBalance(BigDecimal balance) {
 
-        if (balance == null
-                || balance.compareTo(BigDecimal.ZERO) < 0) {
-
+        if (!isValidBalance(balance)) {
             throw new IllegalArgumentException(
                     "Invalid account balance.");
         }
@@ -46,14 +48,27 @@ public class Account {
         this.balance = balance;
     }
 
+    // Reusable balance validation method.
+    private boolean isValidBalance(BigDecimal balance) {
+        return balance != null
+                && balance.compareTo(BigDecimal.ZERO) >= 0;
+    }
+
     public void withdrawFunds(BigDecimal amount) {
 
+        // Validate withdrawal amount.
         if (amount == null
-                || amount.compareTo(BigDecimal.ZERO) <= 0
-                || amount.compareTo(balance) > 0) {
+                || amount.compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new IllegalArgumentException(
                     "Invalid withdrawal amount.");
+        }
+
+        // Check available account balance.
+        if (amount.compareTo(balance) > 0) {
+
+            throw new IllegalArgumentException(
+                    "Insufficient balance.");
         }
 
         balance = balance.subtract(amount);

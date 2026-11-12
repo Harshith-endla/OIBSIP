@@ -8,11 +8,8 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        // Create the user repository.
-        UserRepository userRepository = new UserRepository();
-
         // Create the authentication service.
-        AuthenticationService authenticationService = new AuthenticationService(userRepository);
+        AuthenticationService authenticationService = new AuthenticationService();
 
         // Create the bank.
         Bank bank = new Bank();

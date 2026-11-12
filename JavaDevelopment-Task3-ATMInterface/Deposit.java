@@ -1,4 +1,3 @@
-
 import java.math.BigDecimal;
 import java.util.Scanner;
 
@@ -12,6 +11,7 @@ public class Deposit {
     private final TransactionHistory transactionHistory;
     private BigDecimal balance;
 
+    // Constructor
     public Deposit(
             Scanner scanner,
             BigDecimal currentBalance,
@@ -20,6 +20,7 @@ public class Deposit {
         if (scanner == null || currentBalance == null
                 || currentBalance.compareTo(BigDecimal.ZERO) < 0
                 || transactionHistory == null) {
+
             throw new IllegalArgumentException(
                     "Invalid deposit details.");
         }
@@ -29,9 +30,11 @@ public class Deposit {
         this.transactionHistory = transactionHistory;
     }
 
+    // Starts the deposit process
     public BigDecimal startDeposit() {
 
         while (true) {
+
             System.out.println("\n================================");
             System.out.println("           CASH DEPOSIT");
             System.out.println("================================");
@@ -44,6 +47,7 @@ public class Deposit {
             }
 
             while (true) {
+
                 System.out.print(
                         "\nConfirm deposit of Rs " + amount + "? (Y/N): ");
 
@@ -55,24 +59,29 @@ public class Deposit {
 
                 if (confirmation.equalsIgnoreCase("Y")) {
 
+                    // Add the deposit amount
                     balance = balance.add(amount);
 
+                    // Create and record the transaction
                     Transaction transaction = new Transaction(
                             Transaction.TransactionType.DEPOSIT,
                             amount,
-                            "Cash Deposit");
+                            Transaction.Descriptions.DEPOSIT);
 
                     transactionHistory.addTransaction(transaction);
 
+                    // Display deposit receipt
                     displayReceipt(amount, balance);
 
                     return balance;
 
                 } else if (confirmation.equalsIgnoreCase("N")) {
+
                     System.out.println("\nDeposit cancelled.");
                     return balance;
 
                 } else {
+
                     System.out.println(
                             "Invalid confirmation. Please enter Y or N.");
                 }
@@ -80,9 +89,11 @@ public class Deposit {
         }
     }
 
+    // Validates the deposit amount
     private BigDecimal getDepositAmount() {
 
         while (true) {
+
             System.out.print("\nEnter deposit amount (Rs): ");
 
             if (!scanner.hasNextLine()) {
@@ -95,34 +106,46 @@ public class Deposit {
 
             try {
                 amount = new BigDecimal(input);
+
             } catch (NumberFormatException e) {
+
                 System.out.println(
                         "Invalid amount. Please enter a numeric value.");
                 continue;
             }
 
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                System.out.println("Amount must be greater than zero.");
+
+                System.out.println(
+                        "Amount must be greater than zero.");
 
             } else if (amount.compareTo(MIN_AMOUNT) < 0) {
+
                 System.out.println(
-                        "Minimum deposit amount is Rs 100.");
+                        "Minimum deposit amount is Rs "
+                                + MIN_AMOUNT.toPlainString() + ".");
 
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
+
                 System.out.println(
-                        "Maximum deposit amount is Rs 50,000.");
+                        "Maximum deposit amount is Rs "
+                                + MAX_AMOUNT.toPlainString() + ".");
 
             } else if (amount.remainder(DENOMINATION)
                     .compareTo(BigDecimal.ZERO) != 0) {
+
                 System.out.println(
-                        "Deposit amount must be in multiples of Rs 100.");
+                        "Deposit amount must be in multiples of Rs "
+                                + DENOMINATION.toPlainString() + ".");
 
             } else {
+
                 return amount;
             }
         }
     }
 
+    // Displays the deposit receipt
     private void displayReceipt(
             BigDecimal amount,
             BigDecimal updatedBalance) {
@@ -130,7 +153,8 @@ public class Deposit {
         System.out.println("\n================================");
         System.out.println("         DEPOSIT RECEIPT");
         System.out.println("================================");
-        System.out.println("Transaction : Cash Deposit");
+        System.out.println("Transaction : "
+                + Transaction.Descriptions.DEPOSIT);
         System.out.println("Amount      : Rs " + amount);
         System.out.println("New Balance : Rs " + updatedBalance);
         System.out.println("================================");

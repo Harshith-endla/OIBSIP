@@ -7,8 +7,9 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
 
-    public AuthenticationService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    // Constructor creates and initializes the user repository.
+    public AuthenticationService() {
+        this.userRepository = new UserRepository();
     }
 
     public String login(Console console) {

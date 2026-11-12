@@ -68,7 +68,7 @@ public class Withdraw {
                     Transaction transaction = new Transaction(
                             Transaction.TransactionType.WITHDRAWAL,
                             amount,
-                            "Cash Withdrawal");
+                            Transaction.Descriptions.WITHDRAWAL);
 
                     transactionHistory.addTransaction(transaction);
 
@@ -91,8 +91,10 @@ public class Withdraw {
 
                         if (choice.equals("1")) {
                             break;
+
                         } else if (choice.equals("2")) {
                             return balance;
+
                         } else {
                             System.out.println(
                                     "Invalid choice. Please select 1 or 2.");
@@ -148,7 +150,8 @@ public class Withdraw {
             } else if (amount.compareTo(MIN_AMOUNT) < 0) {
 
                 System.out.println(
-                        "Minimum withdrawal amount is Rs 100.");
+                        "Minimum withdrawal amount is Rs "
+                                + MIN_AMOUNT.toPlainString() + ".");
 
             } else if (amount.compareTo(balance) > 0) {
 
@@ -158,13 +161,15 @@ public class Withdraw {
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
 
                 System.out.println(
-                        "Maximum withdrawal amount is Rs 25,000.");
+                        "Maximum withdrawal amount is Rs "
+                                + MAX_AMOUNT.toPlainString() + ".");
 
             } else if (amount.remainder(DENOMINATION)
                     .compareTo(BigDecimal.ZERO) != 0) {
 
                 System.out.println(
-                        "Withdrawal amount must be in multiples of Rs 100.");
+                        "Withdrawal amount must be in multiples of Rs "
+                                + DENOMINATION.toPlainString() + ".");
 
             } else {
 
@@ -183,7 +188,8 @@ public class Withdraw {
         System.out.println("\n================================");
         System.out.println("       WITHDRAWAL RECEIPT");
         System.out.println("================================");
-        System.out.println("Transaction : Cash Withdrawal");
+        System.out.println("Transaction : "
+                + Transaction.Descriptions.WITHDRAWAL);
         System.out.println("Amount      : Rs " + amount);
         System.out.println("Date & Time : "
                 + transactionDateTime.format(formatter));
