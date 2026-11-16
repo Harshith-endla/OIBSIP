@@ -1,4 +1,5 @@
-
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class Atm {
@@ -8,6 +9,10 @@ public class Atm {
     private final Bank bank;
 
     public Atm(Scanner scanner, Account account, Bank bank) {
+
+        if (scanner == null || account == null || bank == null) {
+            throw new IllegalArgumentException("Invalid ATM configuration.");
+        }
 
         this.scanner = scanner;
         this.account = account;
@@ -42,64 +47,91 @@ public class Atm {
             switch (choice) {
 
                 case "1":
-
-                    System.out.println("\n================================");
-                    System.out.println("       TRANSACTION HISTORY");
-                    System.out.println("================================");
-
+                    // TransactionHistory displays its own heading.
                     account.getTransactionHistory().displayHistory();
-
                     break;
 
-                case "2":
+                case "2": {
+                    BigDecimal previousBalance = account.getBalance();
 
                     Withdraw withdraw = new Withdraw(
                             scanner,
-                            account.getBalance(),
-                            account.getTransactionHistory());
+                            previousBalance,
+                            account.getTransactionHistory(),
+                            updatedBalance -> {
+                                account.setBalance(updatedBalance);
+                                saveBankSafely();
+                            });
 
-                    account.setBalance(
-                            withdraw.startWithdrawal());
-
+                    BigDecimal updatedBalance = withdraw.startWithdrawal();
+                    account.setBalance(updatedBalance);
                     break;
+                }
 
-                case "3":
+                case "3": {
+                    BigDecimal previousBalance = account.getBalance();
 
                     Deposit deposit = new Deposit(
                             scanner,
-                            account.getBalance(),
+                            previousBalance,
                             account.getTransactionHistory());
 
-                    account.setBalance(
-                            deposit.startDeposit());
+                    BigDecimal updatedBalance = deposit.startDeposit();
+                    account.setBalance(updatedBalance);
 
+                    if (updatedBalance.compareTo(previousBalance) != 0) {
+                        saveBankSafely();
+                    }
                     break;
+                }
 
-                case "4":
-
+                case "4": {
                     Transfer transfer = new Transfer(
                             scanner,
                             account,
                             bank);
 
-                    transfer.startTransfer();
-
+                    if (transfer.startTransfer()) {
+                        saveBankSafely();
+                    }
                     break;
+                }
 
                 case "5":
+                    // Save once more when leaving as a final safeguard.
+                    saveBankSafely();
 
                     System.out.println("\nThank you for using our ATM.");
                     System.out.println("Have a nice day!");
 
                     running = false;
-
                     break;
 
                 default:
-
                     System.out.println(
                             "\nInvalid choice. Please select 1 to 5.");
             }
+        }
+
+        // Save any completed operation if input ended unexpectedly.
+        if (running) {
+            saveBankSafely();
+        }
+    }
+
+    // Reports save failures clearly; it never silently claims the data was saved.
+    private void saveBankSafely() {
+
+        try {
+            bank.saveBank();
+            System.out.println("\nAccount data saved successfully.");
+
+        } catch (IOException e) {
+            System.out.println(
+                    "\nWARNING: The transaction may be complete, but account data could not be saved.");
+            System.out.println(
+                    "Do not assume this transaction will be available after restarting the ATM.");
+            System.out.println("Save error: " + e.getMessage());
         }
     }
 }
