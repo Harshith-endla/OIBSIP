@@ -2,6 +2,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 public class Withdraw {
 
@@ -11,17 +12,20 @@ public class Withdraw {
 
     private final Scanner scanner;
     private final TransactionHistory transactionHistory;
+    private final Consumer<BigDecimal> onSuccessfulWithdrawal;
     private BigDecimal balance;
 
     // Constructor
     public Withdraw(
             Scanner scanner,
             BigDecimal currentBalance,
-            TransactionHistory transactionHistory) {
+            TransactionHistory transactionHistory,
+            Consumer<BigDecimal> onSuccessfulWithdrawal) {
 
         if (scanner == null || currentBalance == null
                 || currentBalance.compareTo(BigDecimal.ZERO) < 0
-                || transactionHistory == null) {
+                || transactionHistory == null
+                || onSuccessfulWithdrawal == null) {
 
             throw new IllegalArgumentException(
                     "Invalid withdrawal details.");
@@ -30,6 +34,7 @@ public class Withdraw {
         this.scanner = scanner;
         this.balance = currentBalance;
         this.transactionHistory = transactionHistory;
+        this.onSuccessfulWithdrawal = onSuccessfulWithdrawal;
     }
 
     // Starts the withdrawal process
@@ -71,6 +76,9 @@ public class Withdraw {
                             Transaction.Descriptions.WITHDRAWAL);
 
                     transactionHistory.addTransaction(transaction);
+
+                    // Update the account and save immediately, including repeated withdrawals.
+                    onSuccessfulWithdrawal.accept(balance);
 
                     // Display withdrawal receipt
                     displayReceipt(amount, transaction.getDateTime());
