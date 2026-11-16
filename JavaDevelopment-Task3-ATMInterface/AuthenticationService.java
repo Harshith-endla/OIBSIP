@@ -1,5 +1,5 @@
-
 import java.io.Console;
+import java.util.Arrays;
 
 public class AuthenticationService {
 
@@ -7,7 +7,6 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
 
-    // Constructor creates and initializes the user repository.
     public AuthenticationService() {
         this.userRepository = new UserRepository();
     }
@@ -16,7 +15,8 @@ public class AuthenticationService {
 
         if (console == null) {
             System.out.println("Console input is unavailable.");
-            System.out.println("Please run this program using Command Prompt or PowerShell.");
+            System.out.println(
+                    "Please run this program using Command Prompt or PowerShell.");
             return null;
         }
 
@@ -26,23 +26,31 @@ public class AuthenticationService {
             System.out.println("          ATM LOGIN");
             System.out.println("================================");
 
-            String userId = console.readLine("Enter User ID: ").trim();
+            String userId = console.readLine("Enter User ID: ");
+
+            if (userId == null) {
+                return null;
+            }
 
             char[] enteredPin = console.readPassword("Enter 4-digit PIN: ");
 
+            if (enteredPin == null) {
+                return null;
+            }
+
             String pin = new String(enteredPin);
-            java.util.Arrays.fill(enteredPin, ' ');
+            Arrays.fill(enteredPin, ' ');
 
             if (userRepository.credentialsMatch(userId, pin)) {
 
                 System.out.println("\nLogin successful!");
-                System.out.println("Welcome, " + userId.toUpperCase() + ".");
+                System.out.println("Welcome, " + userId.trim().toUpperCase() + ".");
 
-                return userId.toUpperCase();
+                return userId.trim().toUpperCase();
             }
 
-            System.out.println("\nInvalid credentials. Please check your User ID and PIN.");
-
+            System.out.println(
+                    "\nInvalid credentials. Please check your User ID and PIN.");
             System.out.println("Attempts remaining: "
                     + (MAX_ATTEMPTS - attempt));
         }
