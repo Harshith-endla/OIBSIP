@@ -1,6 +1,6 @@
-
-import java.util.Scanner;
 import java.io.Console;
+import java.io.IOException;
+import java.util.Scanner;
 
 public class Main {
 
@@ -8,11 +8,26 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        // Create the authentication service.
-        AuthenticationService authenticationService = new AuthenticationService();
+        // Load saved bank data and create the initial data file when needed.
+        Bank bank;
 
-        // Create the bank.
-        Bank bank = new Bank();
+        try {
+            bank = Bank.loadBank();
+
+        } catch (IOException | ClassNotFoundException e) {
+
+            System.out.println("\nUnable to load bank data.");
+            System.out.println(
+                    "The ATM cannot start because account data could not be read safely.");
+            System.out.println("Details: " + e.getMessage());
+
+            scanner.close();
+            return;
+        }
+
+        // Create the authentication service.
+        AuthenticationService authenticationService =
+                new AuthenticationService();
 
         // Get the system console for secure PIN input.
         Console console = System.console();
@@ -39,7 +54,6 @@ public class Main {
 
         // Start the ATM application.
         Atm atm = new Atm(scanner, account, bank);
-
         atm.displayMenu();
 
         scanner.close();
