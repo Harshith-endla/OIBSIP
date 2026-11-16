@@ -1,10 +1,13 @@
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class TransactionHistory {
+public class TransactionHistory implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // Stores all ATM transactions.
     private final ArrayList<Transaction> transactions = new ArrayList<>();
