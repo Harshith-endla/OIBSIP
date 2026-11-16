@@ -1,7 +1,9 @@
-
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Account {
+public class Account implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final String accountId;
     private BigDecimal balance;
@@ -16,7 +18,7 @@ public class Account {
         }
 
         // Validate opening balance.
-        if (!isValidBalance(openingBalance)) {
+        if (!MoneyValidator.isNonNegativeBalance(openingBalance)) {
             throw new IllegalArgumentException(
                     "Invalid opening balance.");
         }
@@ -40,7 +42,7 @@ public class Account {
 
     public void setBalance(BigDecimal balance) {
 
-        if (!isValidBalance(balance)) {
+        if (!MoneyValidator.isNonNegativeBalance(balance)) {
             throw new IllegalArgumentException(
                     "Invalid account balance.");
         }
@@ -48,18 +50,10 @@ public class Account {
         this.balance = balance;
     }
 
-    // Reusable balance validation method.
-    private boolean isValidBalance(BigDecimal balance) {
-        return balance != null
-                && balance.compareTo(BigDecimal.ZERO) >= 0;
-    }
-
     public void withdrawFunds(BigDecimal amount) {
 
         // Validate withdrawal amount.
-        if (amount == null
-                || amount.compareTo(BigDecimal.ZERO) <= 0) {
-
+        if (!MoneyValidator.isPositiveAmount(amount)) {
             throw new IllegalArgumentException(
                     "Invalid withdrawal amount.");
         }
@@ -76,9 +70,8 @@ public class Account {
 
     public void depositFunds(BigDecimal amount) {
 
-        if (amount == null
-                || amount.compareTo(BigDecimal.ZERO) <= 0) {
-
+        // Validate deposit amount.
+        if (!MoneyValidator.isPositiveAmount(amount)) {
             throw new IllegalArgumentException(
                     "Invalid deposit amount.");
         }
