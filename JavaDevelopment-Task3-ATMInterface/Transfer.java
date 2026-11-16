@@ -1,13 +1,10 @@
-
 import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class Transfer {
 
     private static final BigDecimal MIN_AMOUNT = new BigDecimal("100");
-
     private static final BigDecimal MAX_AMOUNT = new BigDecimal("25000");
-
     private static final BigDecimal DENOMINATION = new BigDecimal("100");
 
     private final Scanner scanner;
@@ -26,7 +23,8 @@ public class Transfer {
         this.bank = bank;
     }
 
-    public void startTransfer() {
+    // Returns true only when the transfer has been completed successfully.
+    public boolean startTransfer() {
 
         System.out.println("\n================================");
         System.out.println("         MONEY TRANSFER");
@@ -41,7 +39,7 @@ public class Transfer {
         System.out.print("\nEnter recipient User ID: ");
 
         if (!scanner.hasNextLine()) {
-            return;
+            return false;
         }
 
         String recipientId = scanner.nextLine()
@@ -50,28 +48,27 @@ public class Transfer {
         Account recipient = bank.findAccount(recipientId);
 
         if (recipient == null) {
-            System.out.println(
-                    "\nRecipient account not found.");
-            return;
+            System.out.println("\nRecipient account not found.");
+            return false;
         }
 
         if (sender.getAccountId().equals(recipient.getAccountId())) {
             System.out.println(
                     "\nYou cannot transfer money to your own account.");
-            return;
+            return false;
         }
 
         BigDecimal amount = getTransferAmount();
 
         if (amount == null) {
-            return;
+            return false;
         }
 
         if (amount.compareTo(sender.getBalance()) > 0) {
             System.out.println("\nInsufficient Funds");
             System.out.println("Available Balance: Rs "
                     + sender.getBalance());
-            return;
+            return false;
         }
 
         System.out.println("\n================================");
@@ -84,38 +81,35 @@ public class Transfer {
         System.out.println("Amount       : Rs " + amount);
         System.out.println("================================");
 
-        System.out.print(
-                "\nConfirm transfer? (Y/N): ");
+        System.out.print("\nConfirm transfer? (Y/N): ");
 
         if (!scanner.hasNextLine()) {
-            return;
+            return false;
         }
 
         String confirmation = scanner.nextLine().trim();
 
         if (confirmation.equalsIgnoreCase("Y")) {
 
-            // Deduct money from sender.
-            sender.withdrawFunds(amount);
-
-            // Add money to recipient.
-            recipient.depositFunds(amount);
-
-            // Record sender's transaction.
+            // Prepare both records before changing either account.
             Transaction senderTransaction = new Transaction(
                     Transaction.TransactionType.TRANSFER,
                     amount,
                     "Transfer to " + recipient.getAccountId());
 
-            sender.getTransactionHistory()
-                    .addTransaction(senderTransaction);
-
-            // Record recipient's transaction.
             Transaction recipientTransaction = new Transaction(
                     Transaction.TransactionType.TRANSFER,
                     amount,
                     "Transfer received from "
                             + sender.getAccountId());
+
+            // Update both account balances.
+            sender.withdrawFunds(amount);
+            recipient.depositFunds(amount);
+
+            // Record the transfer for both accounts.
+            sender.getTransactionHistory()
+                    .addTransaction(senderTransaction);
 
             recipient.getTransactionHistory()
                     .addTransaction(recipientTransaction);
@@ -124,6 +118,8 @@ public class Transfer {
             System.out.println("Transferred Amount: Rs " + amount);
             System.out.println("Remaining Balance: Rs "
                     + sender.getBalance());
+
+            return true;
 
         } else if (confirmation.equalsIgnoreCase("N")) {
 
@@ -134,56 +130,50 @@ public class Transfer {
             System.out.println(
                     "\nInvalid confirmation. Transfer cancelled.");
         }
+
+        return false;
     }
 
     private BigDecimal getTransferAmount() {
 
         while (true) {
 
-            System.out.print(
-                    "\nEnter transfer amount (Rs): ");
+            System.out.print("\nEnter transfer amount (Rs): ");
 
             if (!scanner.hasNextLine()) {
                 return null;
             }
 
             String input = scanner.nextLine().trim();
-
             BigDecimal amount;
 
             try {
                 amount = new BigDecimal(input);
 
             } catch (NumberFormatException e) {
-
                 System.out.println(
                         "Invalid amount. Enter a numeric value.");
                 continue;
             }
 
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-
                 System.out.println(
                         "Amount must be greater than zero.");
 
             } else if (amount.compareTo(MIN_AMOUNT) < 0) {
-
                 System.out.println(
                         "Minimum transfer amount is Rs 100.");
 
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
-
                 System.out.println(
                         "Maximum transfer amount is Rs 25,000.");
 
             } else if (amount.remainder(DENOMINATION)
                     .compareTo(BigDecimal.ZERO) != 0) {
-
                 System.out.println(
                         "Transfer amount must be in multiples of Rs 100.");
 
             } else {
-
                 return amount;
             }
         }
