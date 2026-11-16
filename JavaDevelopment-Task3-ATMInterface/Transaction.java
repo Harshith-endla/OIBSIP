@@ -1,7 +1,10 @@
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Transaction {
+public class Transaction implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // Types of ATM transactions
     public enum TransactionType {
@@ -33,8 +36,8 @@ public class Transaction {
             BigDecimal amount,
             String details) {
 
-        if (type == null || amount == null
-                || amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (type == null
+                || !MoneyValidator.isPositiveAmount(amount)) {
 
             throw new IllegalArgumentException(
                     "Invalid transaction details.");
