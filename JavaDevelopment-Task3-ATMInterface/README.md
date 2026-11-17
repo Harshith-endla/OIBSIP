@@ -103,6 +103,16 @@ Both `bank-data.ser` and `bank-data.tmp` are generated runtime files and should 
 - `TransactionHistory.java` — transaction records and display
 - `MoneyValidator.java` — shared monetary validation helpers
 
+### Why `.ser`?
+
+The application uses a `.ser` file because Java provides built-in object serialization through `ObjectOutputStream` and `ObjectInputStream`.
+
+- **No external libraries:** Serialization is supported directly by Java.
+- **Easy object storage:** It saves the complete `Bank` object, including account details, balances, and transaction histories.
+- **Data persistence:** Saved objects can be restored when the application restarts.
+- **Limitation:** Serialized files are stored in binary format, so they are not human-readable like JSON. This approach is suitable for this educational
+  Java project but is not intended as a production banking storage solution.
+
 ## Limitations
 
 This is an educational console project, not production banking software. Demo PINs are stored in source code, and Java object serialization is used for local persistence. It does not provide production-grade credential storage, encryption, multi-user concurrency control, or banking-grade transaction guarantees.
