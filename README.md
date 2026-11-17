@@ -1,4 +1,4 @@
-# Java Development – Task 3: ATM Interface
+# Java Development Internship Projects
 
 **Track:** Java Development  
 **Completion Rule:** Complete at least 2 of the 5 assigned tasks.
