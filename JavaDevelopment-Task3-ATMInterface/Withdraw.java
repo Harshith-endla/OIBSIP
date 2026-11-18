@@ -45,7 +45,7 @@ public class Withdraw {
             System.out.println("\n================================");
             System.out.println("          CASH WITHDRAWAL");
             System.out.println("================================");
-            System.out.println("Available Balance: Rs " + balance);
+            System.out.println("Available Balance: Rs." + balance);
 
             BigDecimal amount = getWithdrawalAmount();
 
@@ -56,7 +56,7 @@ public class Withdraw {
             while (true) {
 
                 System.out.print(
-                        "\nConfirm withdrawal of Rs " + amount + "? (Y/N): ");
+                        "\nConfirm withdrawal of Rs." + amount + "? (Y/N): ");
 
                 if (!scanner.hasNextLine()) {
                     return balance;
@@ -130,7 +130,7 @@ public class Withdraw {
 
         while (true) {
 
-            System.out.print("\nEnter withdrawal amount (Rs): ");
+            System.out.print("\nEnter withdrawal amount (Rs.): ");
 
             if (!scanner.hasNextLine()) {
                 return null;
@@ -164,7 +164,7 @@ public class Withdraw {
             } else if (amount.compareTo(balance) > 0) {
 
                 System.out.println("Insufficient Funds");
-                System.out.println("Available balance: Rs " + balance);
+                System.out.println("Available balance: Rs." + balance);
 
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
 
@@ -198,10 +198,10 @@ public class Withdraw {
         System.out.println("================================");
         System.out.println("Transaction : "
                 + Transaction.Descriptions.WITHDRAWAL);
-        System.out.println("Amount      : Rs " + amount);
+        System.out.println("Amount      : Rs." + amount);
         System.out.println("Date & Time : "
                 + transactionDateTime.format(formatter));
-        System.out.println("Remaining   : Rs " + balance);
+        System.out.println("Remaining   : Rs." + balance);
         System.out.println("================================");
         System.out.println("Please collect your cash.");
         System.out.println("Thank you!");

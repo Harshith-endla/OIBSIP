@@ -38,7 +38,7 @@ public class Deposit {
             System.out.println("\n================================");
             System.out.println("           CASH DEPOSIT");
             System.out.println("================================");
-            System.out.println("Available Balance: Rs " + balance);
+            System.out.println("Available Balance: Rs." + balance);
 
             BigDecimal amount = getDepositAmount();
 
@@ -49,7 +49,7 @@ public class Deposit {
             while (true) {
 
                 System.out.print(
-                        "\nConfirm deposit of Rs " + amount + "? (Y/N): ");
+                        "\nConfirm deposit of Rs." + amount + "? (Y/N): ");
 
                 if (!scanner.hasNextLine()) {
                     return balance;
@@ -94,7 +94,7 @@ public class Deposit {
 
         while (true) {
 
-            System.out.print("\nEnter deposit amount (Rs): ");
+            System.out.print("\nEnter deposit amount (Rs.): ");
 
             if (!scanner.hasNextLine()) {
                 return null;
@@ -122,20 +122,20 @@ public class Deposit {
             } else if (amount.compareTo(MIN_AMOUNT) < 0) {
 
                 System.out.println(
-                        "Minimum deposit amount is Rs "
+                        "Minimum deposit amount is Rs."
                                 + MIN_AMOUNT.toPlainString() + ".");
 
             } else if (amount.compareTo(MAX_AMOUNT) > 0) {
 
                 System.out.println(
-                        "Maximum deposit amount is Rs "
+                        "Maximum deposit amount is Rs."
                                 + MAX_AMOUNT.toPlainString() + ".");
 
             } else if (amount.remainder(DENOMINATION)
                     .compareTo(BigDecimal.ZERO) != 0) {
 
                 System.out.println(
-                        "Deposit amount must be in multiples of Rs "
+                        "Deposit amount must be in multiples of Rs."
                                 + DENOMINATION.toPlainString() + ".");
 
             } else {
@@ -155,8 +155,8 @@ public class Deposit {
         System.out.println("================================");
         System.out.println("Transaction : "
                 + Transaction.Descriptions.DEPOSIT);
-        System.out.println("Amount      : Rs " + amount);
-        System.out.println("New Balance : Rs " + updatedBalance);
+        System.out.println("Amount      : Rs." + amount);
+        System.out.println("New Balance : Rs." + updatedBalance);
         System.out.println("================================");
         System.out.println("Deposit successful!");
         System.out.println("Thank you!");

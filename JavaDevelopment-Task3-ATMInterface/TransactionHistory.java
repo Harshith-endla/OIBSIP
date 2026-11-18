@@ -56,7 +56,7 @@ public class TransactionHistory implements Serializable {
             System.out.println("--------------------------------");
             System.out.println("Type: " + transaction.getType());
 
-            System.out.println("Amount: RS"
+            System.out.println("Amount: RS."
                     + amountFormat.format(transaction.getAmount()));
 
             System.out.println("Date: "

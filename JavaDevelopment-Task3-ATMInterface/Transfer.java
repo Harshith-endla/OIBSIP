@@ -33,7 +33,7 @@ public class Transfer {
         System.out.println("Sender Account: "
                 + sender.getAccountId());
 
-        System.out.println("Available Balance: Rs "
+        System.out.println("Available Balance: Rs. "
                 + sender.getBalance());
 
         System.out.print("\nEnter recipient User ID: ");
@@ -66,7 +66,7 @@ public class Transfer {
 
         if (amount.compareTo(sender.getBalance()) > 0) {
             System.out.println("\nInsufficient Funds");
-            System.out.println("Available Balance: Rs "
+            System.out.println("Available Balance: Rs."
                     + sender.getBalance());
             return false;
         }
@@ -78,7 +78,7 @@ public class Transfer {
                 + sender.getAccountId());
         System.out.println("To Account   : "
                 + recipient.getAccountId());
-        System.out.println("Amount       : Rs " + amount);
+        System.out.println("Amount       : Rs." + amount);
         System.out.println("================================");
 
         System.out.print("\nConfirm transfer? (Y/N): ");
@@ -115,8 +115,8 @@ public class Transfer {
                     .addTransaction(recipientTransaction);
 
             System.out.println("\nTransfer successful!");
-            System.out.println("Transferred Amount: Rs " + amount);
-            System.out.println("Remaining Balance: Rs "
+            System.out.println("Transferred Amount: Rs." + amount);
+            System.out.println("Remaining Balance: Rs."
                     + sender.getBalance());
 
             return true;
@@ -138,7 +138,7 @@ public class Transfer {
 
         while (true) {
 
-            System.out.print("\nEnter transfer amount (Rs): ");
+            System.out.print("\nEnter transfer amount (Rs.): ");
 
             if (!scanner.hasNextLine()) {
                 return null;
