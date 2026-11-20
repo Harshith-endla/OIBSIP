@@ -1,8 +1,7 @@
 
 package com.reservation;
 
-import com.reservation.database.DatabaseConnection;
-import java.sql.Connection;
+import com.reservation.database.DatabaseSchema;
 import java.sql.SQLException;
 
 public class Main {
@@ -13,14 +12,11 @@ public class Main {
         System.out.println("     ONLINE RESERVATION SYSTEM");
         System.out.println("==================================");
 
-        try (Connection connection = DatabaseConnection.getConnection()) {
-
-            if (connection != null && !connection.isClosed()) {
-                System.out.println("Database connection successful!");
-            }
+        try {
+            DatabaseSchema.createTables();
 
         } catch (SQLException e) {
-            System.out.println("Database connection failed!");
+            System.out.println("Database initialization failed!");
             e.printStackTrace();
         }
     }
