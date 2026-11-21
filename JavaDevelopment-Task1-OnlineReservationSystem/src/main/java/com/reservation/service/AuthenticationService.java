@@ -28,6 +28,48 @@ public class AuthenticationService {
         this.userRepository = userRepository;
     }
 
+    // Registers a new user.
+    public User registerUser(
+            String fullName,
+            String email,
+            String phone,
+            char[] password)
+            throws SQLException, GeneralSecurityException {
+
+        // Validate required fields.
+        if (fullName == null || fullName.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Full name cannot be empty.");
+        }
+
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Email address cannot be empty.");
+        }
+
+        if (phone == null || phone.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Phone number cannot be empty.");
+        }
+
+        if (password == null || password.length == 0) {
+            throw new IllegalArgumentException(
+                    "Password cannot be empty.");
+        }
+
+        // Remove unnecessary spaces from text fields.
+        String cleanedName = fullName.trim();
+        String cleanedEmail = email.trim();
+        String cleanedPhone = phone.trim();
+
+        // Register the user through the repository.
+        return userRepository.registerUser(
+                cleanedName,
+                cleanedEmail,
+                cleanedPhone,
+                password);
+    }
+
     // Authenticates a user using email and password.
     public User login(String email, char[] password)
             throws SQLException, GeneralSecurityException {
