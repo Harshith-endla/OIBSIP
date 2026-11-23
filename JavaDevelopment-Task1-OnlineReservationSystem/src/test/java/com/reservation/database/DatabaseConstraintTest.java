@@ -41,9 +41,7 @@ class DatabaseConstraintTest {
                 statement.setString(3, "9876543211");
                 statement.setString(4, "another_hash");
 
-                assertThrows(
-                        SQLException.class,
-                        statement::executeUpdate);
+                assertThrows(SQLException.class, statement::executeUpdate);
             }
         }
     }
@@ -75,9 +73,7 @@ class DatabaseConstraintTest {
                 statement.setString(3, "Hyderabad");
                 statement.setString(4, "Bangalore");
 
-                assertThrows(
-                        SQLException.class,
-                        statement::executeUpdate);
+                assertThrows(SQLException.class, statement::executeUpdate);
             }
         }
     }
@@ -86,7 +82,6 @@ class DatabaseConstraintTest {
     void shouldRejectZeroTotalSeats() throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
-
             assertInvalidSchedule(connection, "2026-12-01", 0, 0);
         }
     }
@@ -95,7 +90,6 @@ class DatabaseConstraintTest {
     void shouldRejectNegativeAvailableSeats() throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
-
             assertInvalidSchedule(connection, "2026-12-02", 100, -1);
         }
     }
@@ -105,7 +99,6 @@ class DatabaseConstraintTest {
             throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
-
             assertInvalidSchedule(connection, "2026-12-03", 100, 101);
         }
     }
@@ -114,7 +107,6 @@ class DatabaseConstraintTest {
     void shouldRejectPassengerCountBelowOne() throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
-
             assertInvalidReservation(connection, 0, 10000, "BOOKED");
         }
     }
@@ -123,7 +115,6 @@ class DatabaseConstraintTest {
     void shouldRejectPassengerCountAboveSeven() throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
-
             assertInvalidReservation(connection, 8, 10000, "BOOKED");
         }
     }
@@ -132,7 +123,6 @@ class DatabaseConstraintTest {
     void shouldRejectNegativeTotalFare() throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
-
             assertInvalidReservation(connection, 2, -1, "BOOKED");
         }
     }
@@ -141,32 +131,19 @@ class DatabaseConstraintTest {
     void shouldRejectInvalidReservationStatus() throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
-
             assertInvalidReservation(connection, 2, 10000, "PENDING");
         }
     }
 
     @Test
-    void shouldRejectPassengerAgeBelowMinimum() throws Exception {
+    void shouldRejectPassengerWithoutDateOfBirth() throws Exception {
 
         try (Connection connection = createConnectionWithTestData()) {
 
             createValidReservation(connection, 1);
 
             assertInvalidPassenger(
-                    connection, "Test Passenger", 0, "MALE", "S1");
-        }
-    }
-
-    @Test
-    void shouldRejectPassengerAgeAboveMaximum() throws Exception {
-
-        try (Connection connection = createConnectionWithTestData()) {
-
-            createValidReservation(connection, 1);
-
-            assertInvalidPassenger(
-                    connection, "Test Passenger", 121, "MALE", "S1");
+                    connection, "Test Passenger", null, "MALE", "S1");
         }
     }
 
@@ -178,7 +155,8 @@ class DatabaseConstraintTest {
             createValidReservation(connection, 1);
 
             assertInvalidPassenger(
-                    connection, "Test Passenger", 25, "INVALID", "S1");
+                    connection, "Test Passenger",
+                    "2001-05-15", "INVALID", "S1");
         }
     }
 
@@ -191,12 +169,14 @@ class DatabaseConstraintTest {
             createValidReservation(connection, 2);
 
             insertPassenger(
-                    connection, "First Passenger", 25, "MALE", "S1");
+                    connection, "First Passenger",
+                    "2001-05-15", "MALE", "S1");
 
             assertThrows(
                     SQLException.class,
                     () -> insertPassenger(
-                            connection, "Second Passenger", 30, "FEMALE", "S1"));
+                            connection, "Second Passenger",
+                            "1998-08-20", "FEMALE", "S1"));
         }
     }
 
@@ -208,7 +188,8 @@ class DatabaseConstraintTest {
             createValidReservation(connection, 1);
 
             int rowsInserted = insertPassenger(
-                    connection, "Test Passenger", 25, "MALE", "S1");
+                    connection, "Test Passenger",
+                    "2001-05-15", "MALE", "S1");
 
             assertEquals(1, rowsInserted);
         }
@@ -298,9 +279,7 @@ class DatabaseConstraintTest {
             statement.setInt(6, availableSeats);
             statement.setInt(7, 10000);
 
-            assertThrows(
-                    SQLException.class,
-                    statement::executeUpdate);
+            assertThrows(SQLException.class, statement::executeUpdate);
         }
     }
 
@@ -328,9 +307,7 @@ class DatabaseConstraintTest {
             statement.setInt(6, totalFare);
             statement.setString(7, status);
 
-            assertThrows(
-                    SQLException.class,
-                    statement::executeUpdate);
+            assertThrows(SQLException.class, statement::executeUpdate);
         }
     }
 
@@ -364,14 +341,14 @@ class DatabaseConstraintTest {
     private int insertPassenger(
             Connection connection,
             String passengerName,
-            int age,
+            String dateOfBirth,
             String gender,
             String seatNumber) throws SQLException {
 
         String sql = """
                 INSERT INTO Reservation_Passengers
                     (reservation_id, schedule_id, passenger_name,
-                     age, gender, seat_number)
+                     date_of_birth, gender, seat_number)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
@@ -380,7 +357,7 @@ class DatabaseConstraintTest {
             statement.setInt(1, 1);
             statement.setInt(2, 1);
             statement.setString(3, passengerName);
-            statement.setInt(4, age);
+            statement.setString(4, dateOfBirth);
             statement.setString(5, gender);
             statement.setString(6, seatNumber);
 
@@ -392,7 +369,7 @@ class DatabaseConstraintTest {
     private void assertInvalidPassenger(
             Connection connection,
             String passengerName,
-            int age,
+            String dateOfBirth,
             String gender,
             String seatNumber) {
 
@@ -401,7 +378,7 @@ class DatabaseConstraintTest {
                 () -> insertPassenger(
                         connection,
                         passengerName,
-                        age,
+                        dateOfBirth,
                         gender,
                         seatNumber));
     }

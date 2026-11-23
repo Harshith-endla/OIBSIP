@@ -2,8 +2,12 @@
 package com.reservation.database;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DatabaseSchema {
 
@@ -99,7 +103,7 @@ public class DatabaseSchema {
                         reservation_id INTEGER NOT NULL,
                         schedule_id INTEGER NOT NULL,
                         passenger_name TEXT NOT NULL,
-                        age INTEGER NOT NULL CHECK (age BETWEEN 1 AND 120),
+                        date_of_birth TEXT NOT NULL,
                         gender TEXT NOT NULL
                             CHECK (gender IN ('MALE', 'FEMALE', 'OTHER')),
                         seat_number TEXT,
@@ -110,6 +114,143 @@ public class DatabaseSchema {
                             REFERENCES Reservations(reservation_id, schedule_id)
                     )
                     """);
+        }
+
+        // Upgrade an older database that still uses the age column.
+        migratePassengerAgeToDateOfBirth(connection);
+    }
+
+    // Checks whether a table contains a particular column.
+    private static boolean hasColumn(
+            Connection connection,
+            String tableName,
+            String columnName) throws SQLException {
+
+        String sql = "PRAGMA table_info(" + tableName + ")";
+
+        try (Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                if (columnName.equalsIgnoreCase(
+                        resultSet.getString("name"))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // Rebuilds Reservation_Passengers using date_of_birth instead of age.
+    private static void migratePassengerAgeToDateOfBirth(
+            Connection connection) throws SQLException {
+
+        boolean hasAge = hasColumn(
+                connection, "Reservation_Passengers", "age");
+
+        boolean hasDateOfBirth = hasColumn(
+                connection, "Reservation_Passengers", "date_of_birth");
+
+        // No migration is needed for an already-updated database.
+        if (hasDateOfBirth && !hasAge) {
+            return;
+        }
+
+        // Stop if the database has an unexpected schema.
+        if (!hasAge || hasDateOfBirth) {
+            throw new SQLException(
+                    "Unexpected Reservation_Passengers table structure.");
+        }
+
+        boolean originalAutoCommit = connection.getAutoCommit();
+
+        if (!originalAutoCommit) {
+            throw new SQLException(
+                    "Migration requires a connection with auto-commit enabled.");
+        }
+
+        // SQLite requires foreign keys to be disabled before a transaction
+        // when rebuilding a referenced table.
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("PRAGMA foreign_keys = OFF");
+        }
+
+        try {
+            connection.setAutoCommit(false);
+
+            // Do not guess dates of birth from previously stored ages.
+            try (Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery(
+                            "SELECT COUNT(*) FROM Reservation_Passengers")) {
+
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    throw new SQLException(
+                            "Migration stopped: passenger records exist. "
+                                    + "Their dates of birth cannot be "
+                                    + "recovered from age.");
+                }
+            }
+
+            try (Statement statement = connection.createStatement()) {
+
+                // Create the replacement table.
+                statement.execute("""
+                        CREATE TABLE Reservation_Passengers_new (
+                            passenger_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            reservation_id INTEGER NOT NULL,
+                            schedule_id INTEGER NOT NULL,
+                            passenger_name TEXT NOT NULL,
+                            date_of_birth TEXT NOT NULL,
+                            gender TEXT NOT NULL
+                                CHECK (gender IN ('MALE', 'FEMALE', 'OTHER')),
+                            seat_number TEXT,
+
+                            UNIQUE (schedule_id, seat_number),
+
+                            FOREIGN KEY (reservation_id, schedule_id)
+                                REFERENCES Reservations(
+                                    reservation_id, schedule_id)
+                        )
+                        """);
+
+                // The old table is empty, so no passenger records are lost.
+                statement.execute(
+                        "DROP TABLE Reservation_Passengers");
+
+                // Give the replacement table its original name.
+                statement.execute("""
+                        ALTER TABLE Reservation_Passengers_new
+                        RENAME TO Reservation_Passengers
+                        """);
+
+                // Verify foreign-key relationships before committing.
+                try (ResultSet resultSet = statement.executeQuery("PRAGMA foreign_key_check")) {
+
+                    if (resultSet.next()) {
+                        throw new SQLException(
+                                "Foreign-key validation failed during migration.");
+                    }
+                }
+            }
+
+            connection.commit();
+
+        } catch (SQLException e) {
+
+            connection.rollback();
+            throw e;
+
+        } finally {
+
+            // Restore the normal connection configuration.
+            if (!connection.getAutoCommit()) {
+                connection.setAutoCommit(true);
+            }
+
+            try (Statement statement = connection.createStatement()) {
+                statement.execute("PRAGMA foreign_keys = ON");
+            }
         }
     }
 }
