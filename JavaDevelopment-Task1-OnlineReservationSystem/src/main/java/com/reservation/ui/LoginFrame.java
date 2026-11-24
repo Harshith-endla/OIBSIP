@@ -141,6 +141,12 @@ public class LoginFrame extends JFrame {
                         "Login Successful",
                         JOptionPane.INFORMATION_MESSAGE);
 
+                DashboardFrame dashboardFrame = new DashboardFrame(user);
+
+                dashboardFrame.setVisible(true);
+
+                dispose();
+
             } else {
 
                 messageLabel.setForeground(Color.RED);
