@@ -99,13 +99,9 @@ class DatabaseSchemaTest {
                 }
             }
 
-            // Verify that the new DOB column exists.
             assertTrue(actualColumns.contains("date_of_birth"));
-
-            // Verify that the old age column no longer exists.
             assertFalse(actualColumns.contains("age"));
 
-            // Verify that the other passenger columns remain.
             assertTrue(actualColumns.contains("passenger_id"));
             assertTrue(actualColumns.contains("reservation_id"));
             assertTrue(actualColumns.contains("schedule_id"));
@@ -128,6 +124,82 @@ class DatabaseSchemaTest {
                             "PRAGMA foreign_key_check")) {
 
                 assertFalse(resultSet.next());
+            }
+        }
+    }
+
+    @Test
+    void shouldMigrateExistingUsersToDefaultUserRole() throws Exception {
+
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite::memory:")) {
+
+            // Simulate the old Users table without a role column.
+            try (Statement statement = connection.createStatement()) {
+
+                statement.execute("""
+                        CREATE TABLE Users (
+                            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            full_name TEXT NOT NULL,
+                            email TEXT NOT NULL UNIQUE,
+                            phone TEXT NOT NULL,
+                            password_hash TEXT NOT NULL
+                        )
+                        """);
+
+                // Insert a user into the old table.
+                statement.execute("""
+                        INSERT INTO Users (
+                            full_name,
+                            email,
+                            phone,
+                            password_hash
+                        )
+                        VALUES (
+                            'Test User',
+                            'test@example.com',
+                            '9876543210',
+                            'test-password-hash'
+                        )
+                        """);
+            }
+
+            // Run schema initialization and role migration.
+            DatabaseSchema.createTables(connection);
+
+            // Verify that the existing user was preserved.
+            try (Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("""
+                            SELECT user_id, full_name, email, phone, password_hash, role
+                            FROM Users
+                            WHERE email = 'test@example.com'
+                            """)) {
+
+                assertTrue(resultSet.next());
+
+                assertEquals(1, resultSet.getInt("user_id"));
+                assertEquals("Test User", resultSet.getString("full_name"));
+                assertEquals("test@example.com", resultSet.getString("email"));
+                assertEquals("9876543210", resultSet.getString("phone"));
+                assertEquals("test-password-hash",
+                        resultSet.getString("password_hash"));
+                assertEquals("USER", resultSet.getString("role"));
+
+                assertFalse(resultSet.next());
+            }
+
+            // Run schema initialization again to verify migration safety.
+            DatabaseSchema.createTables(connection);
+
+            try (Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("""
+                            SELECT COUNT(*)
+                            FROM Users
+                            WHERE email = 'test@example.com'
+                            AND role = 'USER'
+                            """)) {
+
+                assertTrue(resultSet.next());
+                assertEquals(1, resultSet.getInt(1));
             }
         }
     }

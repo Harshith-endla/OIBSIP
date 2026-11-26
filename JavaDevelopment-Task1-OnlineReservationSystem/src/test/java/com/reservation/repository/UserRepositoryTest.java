@@ -1,3 +1,4 @@
+
 package com.reservation.repository;
 
 import com.reservation.database.DatabaseSchema;
@@ -47,6 +48,7 @@ class UserRepositoryTest {
         assertTrue(user.getUserId() > 0);
         assertEquals("Harshith Varma", user.getFullName());
         assertEquals("harshith@example.com", user.getEmail());
+        assertEquals("USER", user.getRole());
     }
 
     @Test
@@ -82,6 +84,34 @@ class UserRepositoryTest {
         assertNotNull(foundUser);
         assertEquals("test@example.com", foundUser.getEmail());
         assertEquals("Test User", foundUser.getFullName());
+        assertEquals("USER", foundUser.getRole());
+    }
+
+    @Test
+    void shouldRetrieveStoredAdminRole() throws Exception {
+
+        char[] password = "SecurePassword123".toCharArray();
+
+        userRepository.registerUser(
+                "Admin User",
+                "admin@example.com",
+                "9876543210",
+                password);
+
+        // Simulate an administrator role assigned through
+        // the authorized admin provisioning process.
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("""
+                    UPDATE Users
+                    SET role = 'ADMIN'
+                    WHERE email = 'admin@example.com'
+                    """);
+        }
+
+        User foundUser = userRepository.findByEmail("admin@example.com");
+
+        assertNotNull(foundUser);
+        assertEquals("ADMIN", foundUser.getRole());
     }
 
     @Test

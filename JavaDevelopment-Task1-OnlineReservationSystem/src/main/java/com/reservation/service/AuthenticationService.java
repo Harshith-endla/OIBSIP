@@ -29,6 +29,7 @@ public class AuthenticationService {
     }
 
     // Registers a new user.
+    // Public registration always creates a USER account.
     public User registerUser(
             String fullName,
             String email,
@@ -63,6 +64,7 @@ public class AuthenticationService {
         String cleanedPhone = phone.trim();
 
         // Register the user through the repository.
+        // The repository assigns the USER role.
         return userRepository.registerUser(
                 cleanedName,
                 cleanedEmail,
@@ -82,6 +84,12 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(email.trim());
 
         if (user == null) {
+            return null;
+        }
+
+        // Reject accounts with missing or unsupported roles.
+        if (!"USER".equals(user.getRole())
+                && !"ADMIN".equals(user.getRole())) {
             return null;
         }
 

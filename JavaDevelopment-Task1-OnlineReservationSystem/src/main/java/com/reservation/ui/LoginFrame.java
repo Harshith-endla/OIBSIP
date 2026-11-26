@@ -141,9 +141,18 @@ public class LoginFrame extends JFrame {
                         "Login Successful",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                DashboardFrame dashboardFrame = new DashboardFrame(user);
+                if ("ADMIN".equals(user.getRole())) {
 
-                dashboardFrame.setVisible(true);
+                    AdminDashboardFrame adminDashboardFrame = new AdminDashboardFrame(user);
+
+                    adminDashboardFrame.setVisible(true);
+
+                } else {
+
+                    DashboardFrame dashboardFrame = new DashboardFrame(user);
+
+                    dashboardFrame.setVisible(true);
+                }
 
                 dispose();
 

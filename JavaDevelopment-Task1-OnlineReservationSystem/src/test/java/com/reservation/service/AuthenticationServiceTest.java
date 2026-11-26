@@ -70,6 +70,30 @@ class AuthenticationServiceTest {
         assertNotNull(authenticatedUser);
         assertEquals("Test User", authenticatedUser.getFullName());
         assertEquals("test@example.com", authenticatedUser.getEmail());
+        assertEquals("USER", authenticatedUser.getRole());
+    }
+
+    @Test
+    void shouldLoginAdministratorWithCorrectCredentials() throws Exception {
+
+        registerTestUser();
+
+        // Simulate an administrator account created by
+        // the authorized admin provisioning process.
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("""
+                    UPDATE Users
+                    SET role = 'ADMIN'
+                    WHERE email = 'test@example.com'
+                    """);
+        }
+
+        User authenticatedUser = authenticationService.login(
+                "test@example.com",
+                "SecurePassword123".toCharArray());
+
+        assertNotNull(authenticatedUser);
+        assertEquals("ADMIN", authenticatedUser.getRole());
     }
 
     @Test
@@ -146,11 +170,13 @@ class AuthenticationServiceTest {
         assertEquals("New Test User", registeredUser.getFullName());
         assertEquals("newuser@example.com", registeredUser.getEmail());
         assertEquals("9876543210", registeredUser.getPhone());
+        assertEquals("USER", registeredUser.getRole());
 
         User savedUser = userRepository.findByEmail("newuser@example.com");
 
         assertNotNull(savedUser);
         assertEquals(registeredUser.getUserId(), savedUser.getUserId());
+        assertEquals("USER", savedUser.getRole());
     }
 
     @Test

@@ -6,9 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class DatabaseSchema {
 
     // Creates tables using the application's database connection.
@@ -32,7 +29,9 @@ public class DatabaseSchema {
                         full_name TEXT NOT NULL,
                         email TEXT NOT NULL UNIQUE,
                         phone TEXT NOT NULL,
-                        password_hash TEXT NOT NULL
+                        password_hash TEXT NOT NULL,
+                        role TEXT NOT NULL DEFAULT 'USER'
+                            CHECK (role IN ('ADMIN', 'USER'))
                     )
                     """);
 
@@ -116,7 +115,8 @@ public class DatabaseSchema {
                     """);
         }
 
-        // Upgrade an older database that still uses the age column.
+        // Upgrade existing databases when necessary.
+        migrateUserRole(connection);
         migratePassengerAgeToDateOfBirth(connection);
     }
 
@@ -140,6 +140,24 @@ public class DatabaseSchema {
         }
 
         return false;
+    }
+
+    // Adds the role column to older Users tables.
+    private static void migrateUserRole(
+            Connection connection) throws SQLException {
+
+        if (hasColumn(connection, "Users", "role")) {
+            return;
+        }
+
+        try (Statement statement = connection.createStatement()) {
+
+            statement.execute("""
+                    ALTER TABLE Users
+                    ADD COLUMN role TEXT NOT NULL DEFAULT 'USER'
+                    CHECK (role IN ('ADMIN', 'USER'))
+                    """);
+        }
     }
 
     // Rebuilds Reservation_Passengers using date_of_birth instead of age.
@@ -194,7 +212,6 @@ public class DatabaseSchema {
 
             try (Statement statement = connection.createStatement()) {
 
-                // Create the replacement table.
                 statement.execute("""
                         CREATE TABLE Reservation_Passengers_new (
                             passenger_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -214,17 +231,14 @@ public class DatabaseSchema {
                         )
                         """);
 
-                // The old table is empty, so no passenger records are lost.
                 statement.execute(
                         "DROP TABLE Reservation_Passengers");
 
-                // Give the replacement table its original name.
                 statement.execute("""
                         ALTER TABLE Reservation_Passengers_new
                         RENAME TO Reservation_Passengers
                         """);
 
-                // Verify foreign-key relationships before committing.
                 try (ResultSet resultSet = statement.executeQuery("PRAGMA foreign_key_check")) {
 
                     if (resultSet.next()) {
@@ -243,7 +257,6 @@ public class DatabaseSchema {
 
         } finally {
 
-            // Restore the normal connection configuration.
             if (!connection.getAutoCommit()) {
                 connection.setAutoCommit(true);
             }
