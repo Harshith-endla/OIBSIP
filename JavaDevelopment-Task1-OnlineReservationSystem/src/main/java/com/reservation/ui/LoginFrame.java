@@ -1,4 +1,3 @@
-
 package com.reservation.ui;
 
 import com.reservation.model.User;
@@ -10,8 +9,12 @@ import java.awt.*;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class LoginFrame extends JFrame {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private final AuthenticationService authenticationService;
 
@@ -120,10 +123,28 @@ public class LoginFrame extends JFrame {
         dispose();
     }
 
+    // Validates the email address format.
+    private boolean isValidEmail(String email) {
+
+        return email != null
+                && EMAIL_PATTERN.matcher(email).matches();
+    }
+
     // Handles user authentication.
     private void handleLogin() {
 
         String email = emailField.getText().trim();
+
+        if (!isValidEmail(email)) {
+
+            messageLabel.setForeground(Color.RED);
+            messageLabel.setText("Please enter a valid email address.");
+
+            passwordField.setText("");
+
+            return;
+        }
+
         char[] password = passwordField.getPassword();
 
         try {

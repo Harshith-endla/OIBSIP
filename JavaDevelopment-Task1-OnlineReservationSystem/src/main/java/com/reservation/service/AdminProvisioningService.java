@@ -1,4 +1,3 @@
-
 package com.reservation.service;
 
 import com.reservation.model.User;
@@ -18,6 +17,11 @@ public class AdminProvisioningService {
 
     private final UserRepository userRepository;
     private final Map<String, String> environment;
+
+    // Creates the repository for normal application usage.
+    public AdminProvisioningService() {
+        this(new UserRepository());
+    }
 
     // Uses actual application environment variables.
     public AdminProvisioningService(UserRepository userRepository) {

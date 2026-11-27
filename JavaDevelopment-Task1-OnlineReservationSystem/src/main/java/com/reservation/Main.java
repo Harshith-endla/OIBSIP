@@ -1,8 +1,6 @@
-
 package com.reservation;
 
 import com.reservation.database.DatabaseSchema;
-import com.reservation.repository.UserRepository;
 import com.reservation.service.AdminProvisioningService;
 import com.reservation.ui.LoginFrame;
 
@@ -19,7 +17,8 @@ public class Main {
             DatabaseSchema.createTables();
 
             // Step 2: Create the administrator if configured.
-            AdminProvisioningService adminProvisioningService = new AdminProvisioningService(new UserRepository());
+            AdminProvisioningService adminProvisioningService =
+        new AdminProvisioningService();
 
             adminProvisioningService.provisionAdmin();
 
