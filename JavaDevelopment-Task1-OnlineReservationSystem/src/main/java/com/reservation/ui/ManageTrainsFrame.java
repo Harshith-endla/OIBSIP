@@ -358,10 +358,18 @@ public class ManageTrainsFrame extends JFrame {
                         JOptionPane.WARNING_MESSAGE);
             }
 
+        } catch (IllegalStateException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Train Cannot Be Deleted",
+                    JOptionPane.WARNING_MESSAGE);
+
         } catch (SQLException e) {
 
             showError(
-                    "Unable to delete this train. It may already have associated schedules.",
+                    "Unable to delete this train because of a database error.",
                     e);
         }
     }

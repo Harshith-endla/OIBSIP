@@ -50,7 +50,6 @@ public class TrainRepository {
                 ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-
                 trains.add(mapTrain(resultSet));
             }
         }
@@ -81,6 +80,27 @@ public class TrainRepository {
         }
 
         return null;
+    }
+
+    // Check whether a train has any associated schedules.
+    public boolean hasSchedulesForTrain(int trainId) throws SQLException {
+
+        String sql = """
+                SELECT 1
+                FROM Train_Schedules
+                WHERE train_id = ?
+                LIMIT 1
+                """;
+
+        try (Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, trainId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
     }
 
     // Update existing train details.

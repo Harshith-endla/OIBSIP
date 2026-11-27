@@ -84,11 +84,17 @@ public class TrainService {
         return trainRepository.updateTrain(train);
     }
 
-    // Delete a train.
+    // Delete a train only if it has no associated schedules.
     public boolean deleteTrain(int trainId) throws SQLException {
 
         if (trainId <= 0) {
             throw new IllegalArgumentException("Invalid train ID.");
+        }
+
+        if (trainRepository.hasSchedulesForTrain(trainId)) {
+            throw new IllegalStateException(
+                    "Cannot delete this train because it has existing schedules. "
+                            + "Delete its schedules first.");
         }
 
         return trainRepository.deleteTrain(trainId);
