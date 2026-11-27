@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,11 +39,15 @@ public class TrainRepository {
 
         List<Train> trains = new ArrayList<>();
 
-        String sql = "SELECT * FROM Trains ORDER BY train_number";
+        String sql = """
+                SELECT train_id, train_number, train_name, source, destination
+                FROM Trains
+                ORDER BY train_number
+                """;
 
         try (Connection connection = DatabaseConnection.getConnection();
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql)) {
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
 
@@ -58,7 +61,11 @@ public class TrainRepository {
     // Find a train using its ID.
     public Train getTrainById(int trainId) throws SQLException {
 
-        String sql = "SELECT * FROM Trains WHERE train_id = ?";
+        String sql = """
+                SELECT train_id, train_number, train_name, source, destination
+                FROM Trains
+                WHERE train_id = ?
+                """;
 
         try (Connection connection = DatabaseConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
