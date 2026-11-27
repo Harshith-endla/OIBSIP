@@ -96,6 +96,8 @@ public class DatabaseSchema {
                     """);
 
             // 5. Reservation_Passengers table
+            // Date of birth is stored instead of age because age changes
+            // over time, whereas date of birth remains constant.
             statement.execute("""
                     CREATE TABLE IF NOT EXISTS Reservation_Passengers (
                         passenger_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,7 +119,6 @@ public class DatabaseSchema {
 
         // Upgrade existing databases when necessary.
         migrateUserRole(connection);
-        migratePassengerAgeToDateOfBirth(connection);
     }
 
     // Checks whether a table contains a particular column.
@@ -157,113 +158,6 @@ public class DatabaseSchema {
                     ADD COLUMN role TEXT NOT NULL DEFAULT 'USER'
                     CHECK (role IN ('ADMIN', 'USER'))
                     """);
-        }
-    }
-
-    // Rebuilds Reservation_Passengers using date_of_birth instead of age.
-    private static void migratePassengerAgeToDateOfBirth(
-            Connection connection) throws SQLException {
-
-        boolean hasAge = hasColumn(
-                connection, "Reservation_Passengers", "age");
-
-        boolean hasDateOfBirth = hasColumn(
-                connection, "Reservation_Passengers", "date_of_birth");
-
-        // No migration is needed for an already-updated database.
-        if (hasDateOfBirth && !hasAge) {
-            return;
-        }
-
-        // Stop if the database has an unexpected schema.
-        if (!hasAge || hasDateOfBirth) {
-            throw new SQLException(
-                    "Unexpected Reservation_Passengers table structure.");
-        }
-
-        boolean originalAutoCommit = connection.getAutoCommit();
-
-        if (!originalAutoCommit) {
-            throw new SQLException(
-                    "Migration requires a connection with auto-commit enabled.");
-        }
-
-        // SQLite requires foreign keys to be disabled before a transaction
-        // when rebuilding a referenced table.
-        try (Statement statement = connection.createStatement()) {
-            statement.execute("PRAGMA foreign_keys = OFF");
-        }
-
-        try {
-            connection.setAutoCommit(false);
-
-            // Do not guess dates of birth from previously stored ages.
-            try (Statement statement = connection.createStatement();
-                    ResultSet resultSet = statement.executeQuery(
-                            "SELECT COUNT(*) FROM Reservation_Passengers")) {
-
-                if (resultSet.next() && resultSet.getInt(1) > 0) {
-                    throw new SQLException(
-                            "Migration stopped: passenger records exist. "
-                                    + "Their dates of birth cannot be "
-                                    + "recovered from age.");
-                }
-            }
-
-            try (Statement statement = connection.createStatement()) {
-
-                statement.execute("""
-                        CREATE TABLE Reservation_Passengers_new (
-                            passenger_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            reservation_id INTEGER NOT NULL,
-                            schedule_id INTEGER NOT NULL,
-                            passenger_name TEXT NOT NULL,
-                            date_of_birth TEXT NOT NULL,
-                            gender TEXT NOT NULL
-                                CHECK (gender IN ('MALE', 'FEMALE', 'OTHER')),
-                            seat_number TEXT,
-
-                            UNIQUE (schedule_id, seat_number),
-
-                            FOREIGN KEY (reservation_id, schedule_id)
-                                REFERENCES Reservations(
-                                    reservation_id, schedule_id)
-                        )
-                        """);
-
-                statement.execute(
-                        "DROP TABLE Reservation_Passengers");
-
-                statement.execute("""
-                        ALTER TABLE Reservation_Passengers_new
-                        RENAME TO Reservation_Passengers
-                        """);
-
-                try (ResultSet resultSet = statement.executeQuery("PRAGMA foreign_key_check")) {
-
-                    if (resultSet.next()) {
-                        throw new SQLException(
-                                "Foreign-key validation failed during migration.");
-                    }
-                }
-            }
-
-            connection.commit();
-
-        } catch (SQLException e) {
-
-            connection.rollback();
-            throw e;
-
-        } finally {
-
-            if (!connection.getAutoCommit()) {
-                connection.setAutoCommit(true);
-            }
-
-            try (Statement statement = connection.createStatement()) {
-                statement.execute("PRAGMA foreign_keys = ON");
-            }
         }
     }
 }

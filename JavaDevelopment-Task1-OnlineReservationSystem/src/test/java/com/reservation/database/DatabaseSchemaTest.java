@@ -56,36 +56,16 @@ class DatabaseSchemaTest {
     }
 
     @Test
-    void shouldMigratePassengerAgeToDateOfBirth() throws Exception {
+    void shouldCreatePassengerTableWithDateOfBirth() throws Exception {
 
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite::memory:")) {
 
             // Enable foreign keys for this test connection.
             try (Statement statement = connection.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON");
-
-                // Simulate the old passenger table structure.
-                statement.execute("""
-                        CREATE TABLE Reservation_Passengers (
-                            passenger_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            reservation_id INTEGER NOT NULL,
-                            schedule_id INTEGER NOT NULL,
-                            passenger_name TEXT NOT NULL,
-                            age INTEGER NOT NULL,
-                            gender TEXT NOT NULL
-                                CHECK (gender IN ('MALE', 'FEMALE', 'OTHER')),
-                            seat_number TEXT,
-
-                            UNIQUE (schedule_id, seat_number),
-
-                            FOREIGN KEY (reservation_id, schedule_id)
-                                REFERENCES Reservations(
-                                    reservation_id, schedule_id)
-                        )
-                        """);
             }
 
-            // Run the schema initialization and migration.
+            // Create tables using the current database schema.
             DatabaseSchema.createTables(connection);
 
             Set<String> actualColumns = new HashSet<>();
@@ -99,6 +79,7 @@ class DatabaseSchemaTest {
                 }
             }
 
+            // Verify the current passenger table structure.
             assertTrue(actualColumns.contains("date_of_birth"));
             assertFalse(actualColumns.contains("age"));
 
@@ -109,7 +90,7 @@ class DatabaseSchemaTest {
             assertTrue(actualColumns.contains("gender"));
             assertTrue(actualColumns.contains("seat_number"));
 
-            // Verify that foreign-key enforcement is restored.
+            // Verify that foreign-key enforcement is enabled.
             try (Statement statement = connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(
                             "PRAGMA foreign_keys")) {
