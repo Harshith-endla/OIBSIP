@@ -1,4 +1,3 @@
-
 package com.reservation.ui;
 
 import com.reservation.model.User;
@@ -10,8 +9,12 @@ import java.awt.*;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class RegisterFrame extends JFrame {
+
+    private static final Pattern PHONE_PATTERN = Pattern.compile(
+            "^(?:\\+91[ -]?)?[6-9]\\d{9}$");
 
     private final AuthenticationService authenticationService;
 
@@ -140,6 +143,19 @@ public class RegisterFrame extends JFrame {
                 return;
             }
 
+            // Validate phone number before registration.
+            if (!isValidPhone(phone)) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Please enter a valid Indian mobile number.\n"
+                                + "Example: 9876543210 or +919876543210",
+                        "Validation Error",
+                        JOptionPane.WARNING_MESSAGE);
+
+                return;
+            }
+
             if (!Arrays.equals(password, confirmPassword)) {
 
                 JOptionPane.showMessageDialog(
@@ -214,6 +230,13 @@ public class RegisterFrame extends JFrame {
             passwordField.setText("");
             confirmPasswordField.setText("");
         }
+    }
+
+    // Validates an Indian mobile phone number.
+    private boolean isValidPhone(String phone) {
+
+        return phone != null
+                && PHONE_PATTERN.matcher(phone).matches();
     }
 
     // Checks whether a database error is caused by a duplicate email.
