@@ -77,6 +77,10 @@ public class ManageTrainsFrame extends JFrame {
 
         trainTable.setRowHeight(25);
 
+        // Hide Train ID from the UI while retaining it in the table model.
+        trainTable.removeColumn(
+                trainTable.getColumnModel().getColumn(0));
+
         JScrollPane scrollPane = new JScrollPane(trainTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
@@ -198,7 +202,9 @@ public class ManageTrainsFrame extends JFrame {
 
         } catch (SQLException e) {
 
-            showError("Unable to add train. Check whether the train number already exists.", e);
+            showError(
+                    "Unable to add train. Check whether the train number already exists.",
+                    e);
         }
     }
 
@@ -218,19 +224,21 @@ public class ManageTrainsFrame extends JFrame {
             return;
         }
 
-        int trainId = (int) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = trainTable.convertRowIndexToModel(selectedRow);
+
+        int trainId = (int) tableModel.getValueAt(modelRow, 0);
 
         JTextField numberField = new JTextField(
-                tableModel.getValueAt(selectedRow, 1).toString());
+                tableModel.getValueAt(modelRow, 1).toString());
 
         JTextField nameField = new JTextField(
-                tableModel.getValueAt(selectedRow, 2).toString());
+                tableModel.getValueAt(modelRow, 2).toString());
 
         JTextField sourceField = new JTextField(
-                tableModel.getValueAt(selectedRow, 3).toString());
+                tableModel.getValueAt(modelRow, 3).toString());
 
         JTextField destinationField = new JTextField(
-                tableModel.getValueAt(selectedRow, 4).toString());
+                tableModel.getValueAt(modelRow, 4).toString());
 
         Object[] fields = {
                 "Train Number:", numberField,
@@ -288,7 +296,9 @@ public class ManageTrainsFrame extends JFrame {
 
         } catch (SQLException e) {
 
-            showError("Unable to update train. Check whether the train number already exists.", e);
+            showError(
+                    "Unable to update train. Check whether the train number already exists.",
+                    e);
         }
     }
 
@@ -308,9 +318,11 @@ public class ManageTrainsFrame extends JFrame {
             return;
         }
 
-        int trainId = (int) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = trainTable.convertRowIndexToModel(selectedRow);
 
-        String trainName = tableModel.getValueAt(selectedRow, 2).toString();
+        int trainId = (int) tableModel.getValueAt(modelRow, 0);
+
+        String trainName = tableModel.getValueAt(modelRow, 2).toString();
 
         int choice = JOptionPane.showConfirmDialog(
                 this,
