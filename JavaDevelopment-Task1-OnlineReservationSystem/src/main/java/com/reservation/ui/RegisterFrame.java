@@ -1,3 +1,4 @@
+
 package com.reservation.ui;
 
 import com.reservation.model.User;
@@ -15,6 +16,9 @@ public class RegisterFrame extends JFrame {
 
     private static final Pattern PHONE_PATTERN = Pattern.compile(
             "^(?:\\+91[ -]?)?[6-9]\\d{9}$");
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private final AuthenticationService authenticationService;
 
@@ -143,6 +147,19 @@ public class RegisterFrame extends JFrame {
                 return;
             }
 
+            // Validate email address before registration.
+            if (!EMAIL_PATTERN.matcher(email).matches()) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Please enter a valid email address.",
+                        "Validation Error",
+                        JOptionPane.WARNING_MESSAGE);
+
+                emailField.requestFocusInWindow();
+                return;
+            }
+
             // Validate phone number before registration.
             if (!isValidPhone(phone)) {
 
@@ -245,7 +262,8 @@ public class RegisterFrame extends JFrame {
         String message = exception.getMessage();
 
         return message != null
-                && message.contains("UNIQUE constraint failed: Users.email");
+                && (message.contains("An account with this email already exists.")
+                        || message.contains("UNIQUE constraint failed: Users.email"));
     }
 
     // Returns the user to the login screen.

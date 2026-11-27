@@ -39,6 +39,12 @@ public class UserRepository {
             char[] password)
             throws SQLException, GeneralSecurityException {
 
+        // Check whether an account already exists with this email.
+        if (findByEmail(email) != null) {
+            throw new SQLException(
+                    "An account with this email already exists.");
+        }
+
         String passwordHash = PasswordUtil.hashPassword(password);
 
         String sql = """

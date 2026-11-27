@@ -1,3 +1,4 @@
+
 package com.reservation.ui;
 
 import com.reservation.model.User;
@@ -134,20 +135,52 @@ public class LoginFrame extends JFrame {
     private void handleLogin() {
 
         String email = emailField.getText().trim();
-
-        if (!isValidEmail(email)) {
-
-            messageLabel.setForeground(Color.RED);
-            messageLabel.setText("Please enter a valid email address.");
-
-            passwordField.setText("");
-
-            return;
-        }
-
         char[] password = passwordField.getPassword();
 
         try {
+
+            // Check whether both fields are empty.
+            if (email.isEmpty() && password.length == 0) {
+
+                messageLabel.setForeground(Color.RED);
+                messageLabel.setText(
+                        "Please enter your email and password.");
+
+                return;
+            }
+
+            // Check whether the email is empty.
+            if (email.isEmpty()) {
+
+                messageLabel.setForeground(Color.RED);
+                messageLabel.setText(
+                        "Please enter your email address.");
+
+                emailField.requestFocusInWindow();
+                return;
+            }
+
+            // Check whether the password is empty.
+            if (password.length == 0) {
+
+                messageLabel.setForeground(Color.RED);
+                messageLabel.setText(
+                        "Please enter your password.");
+
+                passwordField.requestFocusInWindow();
+                return;
+            }
+
+            // Validate email address format.
+            if (!isValidEmail(email)) {
+
+                messageLabel.setForeground(Color.RED);
+                messageLabel.setText(
+                        "Please enter a valid email address.");
+
+                emailField.requestFocusInWindow();
+                return;
+            }
 
             User user = authenticationService.login(email, password);
 
