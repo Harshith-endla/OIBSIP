@@ -287,6 +287,44 @@ class AuthenticationServiceTest {
         }
     }
 
+    // ---------------- SPECIAL CHARACTER VALIDATION TESTS ----------------
+
+    @Test
+    void shouldAcceptPasswordContainingActualSpecialCharacter() throws Exception {
+
+        User registeredUser = authenticationService.registerUser(
+                "Special Character User",
+                "specialuser@example.com",
+                "9876543210",
+                "SecurePassword123@".toCharArray());
+
+        assertNotNull(registeredUser);
+    }
+
+    @Test
+    void shouldRejectPasswordContainingSpaceInsteadOfSpecialCharacter() {
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> authenticationService.registerUser(
+                        "Space Test User",
+                        "spaceuser@example.com",
+                        "9876543210",
+                        "SecurePassword123 ".toCharArray()));
+    }
+
+    @Test
+    void shouldRejectPasswordContainingTabInsteadOfSpecialCharacter() {
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> authenticationService.registerUser(
+                        "Tab Test User",
+                        "tabuser@example.com",
+                        "9876543210",
+                        "SecurePassword123\t".toCharArray()));
+    }
+
     @Test
     void shouldRejectInvalidEmailFormatDuringRegistration() {
 

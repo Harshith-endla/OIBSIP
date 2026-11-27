@@ -172,7 +172,7 @@ public class AuthenticationService {
                 hasLowercase = true;
             } else if (Character.isDigit(character)) {
                 hasDigit = true;
-            } else {
+            } else if (isSpecialCharacter(character)) {
                 hasSpecialCharacter = true;
             }
         }
@@ -181,5 +181,28 @@ public class AuthenticationService {
                 && hasLowercase
                 && hasDigit
                 && hasSpecialCharacter;
+    }
+
+    // Checks whether a character is punctuation or a symbol.
+    private boolean isSpecialCharacter(char character) {
+
+        int characterType = Character.getType(character);
+
+        return switch (characterType) {
+            case Character.CONNECTOR_PUNCTUATION,
+                    Character.DASH_PUNCTUATION,
+                    Character.START_PUNCTUATION,
+                    Character.END_PUNCTUATION,
+                    Character.INITIAL_QUOTE_PUNCTUATION,
+                    Character.FINAL_QUOTE_PUNCTUATION,
+                    Character.OTHER_PUNCTUATION,
+                    Character.MATH_SYMBOL,
+                    Character.CURRENCY_SYMBOL,
+                    Character.MODIFIER_SYMBOL,
+                    Character.OTHER_SYMBOL ->
+                true;
+
+            default -> false;
+        };
     }
 }
