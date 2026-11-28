@@ -9,112 +9,113 @@ import java.awt.*;
 
 public class DashboardFrame extends JFrame {
 
-    private final User user;
+        private final User user;
 
-    public DashboardFrame(User user) {
+        public DashboardFrame(User user) {
 
-        if (user == null) {
-            throw new IllegalArgumentException(
-                    "User cannot be null.");
+                if (user == null) {
+                        throw new IllegalArgumentException(
+                                        "User cannot be null.");
+                }
+
+                this.user = user;
+
+                initializeUI();
         }
 
-        this.user = user;
+        // Configures the dashboard window.
+        private void initializeUI() {
 
-        initializeUI();
-    }
+                setTitle("Online Reservation System - Dashboard");
+                setSize(650, 450);
+                setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                setLocationRelativeTo(null);
+                setResizable(false);
 
-    // Configures the dashboard window.
-    private void initializeUI() {
+                JPanel mainPanel = new JPanel(new BorderLayout(15, 20));
+                mainPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
+                mainPanel.setBackground(Color.WHITE);
 
-        setTitle("Online Reservation System - Dashboard");
-        setSize(650, 450);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
+                JLabel titleLabel = new JLabel(
+                                "ONLINE RESERVATION SYSTEM",
+                                SwingConstants.CENTER);
+                titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
 
-        JPanel mainPanel = new JPanel(new BorderLayout(15, 20));
-        mainPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
-        mainPanel.setBackground(Color.WHITE);
+                JLabel welcomeLabel = new JLabel(
+                                "Welcome, " + user.getFullName() + "!",
+                                SwingConstants.CENTER);
+                welcomeLabel.setFont(new Font("Arial", Font.PLAIN, 17));
 
-        JLabel titleLabel = new JLabel(
-                "ONLINE RESERVATION SYSTEM",
-                SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+                JPanel headingPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+                headingPanel.setBackground(Color.WHITE);
+                headingPanel.add(titleLabel);
+                headingPanel.add(welcomeLabel);
 
-        JLabel welcomeLabel = new JLabel(
-                "Welcome, " + user.getFullName() + "!",
-                SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+                mainPanel.add(headingPanel, BorderLayout.NORTH);
 
-        JPanel headingPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        headingPanel.setBackground(Color.WHITE);
-        headingPanel.add(titleLabel);
-        headingPanel.add(welcomeLabel);
+                JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 12, 12));
+                buttonPanel.setBackground(Color.WHITE);
 
-        mainPanel.add(headingPanel, BorderLayout.NORTH);
+                JButton bookTicketButton = new JButton("Book Ticket");
+                JButton trainDetailsButton = new JButton("View Train Details");
+                JButton cancelReservationButton = new JButton("Cancel Reservation");
+                JButton logoutButton = new JButton("Logout");
 
-        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 12, 12));
-        buttonPanel.setBackground(Color.WHITE);
+                JButton[] buttons = {
+                                bookTicketButton,
+                                trainDetailsButton,
+                                cancelReservationButton,
+                                logoutButton
+                };
 
-        JButton bookTicketButton = new JButton("Book Ticket");
-        JButton trainDetailsButton = new JButton("View Train Details");
-        JButton cancelReservationButton = new JButton("Cancel Reservation");
-        JButton logoutButton = new JButton("Logout");
+                for (JButton button : buttons) {
+                        button.setFont(new Font("Arial", Font.BOLD, 15));
+                        button.setFocusPainted(false);
+                        buttonPanel.add(button);
+                }
 
-        JButton[] buttons = {
-                bookTicketButton,
-                trainDetailsButton,
-                cancelReservationButton,
-                logoutButton
-        };
+                mainPanel.add(buttonPanel, BorderLayout.CENTER);
 
-        for (JButton button : buttons) {
-            button.setFont(new Font("Arial", Font.BOLD, 15));
-            button.setFocusPainted(false);
-            buttonPanel.add(button);
+                add(mainPanel);
+
+                // Open the ticket booking screen.
+                bookTicketButton.addActionListener(e -> {
+                        BookTicketFrame bookingFrame = new BookTicketFrame(user);
+                        bookingFrame.setVisible(true);
+                });
+
+                // Temporary message until train details feature is implemented.
+                trainDetailsButton.addActionListener(e -> JOptionPane.showMessageDialog(
+                                this,
+                                "Train details feature is coming soon.",
+                                "Train Details",
+                                JOptionPane.INFORMATION_MESSAGE));
+
+                // Temporary message until cancellation feature is implemented.
+                cancelReservationButton.addActionListener(e -> JOptionPane.showMessageDialog(
+                                this,
+                                "Reservation cancellation feature is coming soon.",
+                                "Cancel Reservation",
+                                JOptionPane.INFORMATION_MESSAGE));
+
+                logoutButton.addActionListener(e -> logout());
         }
 
-        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        // Returns the user to the login screen.
+        private void logout() {
 
-        add(mainPanel);
+                int choice = JOptionPane.showConfirmDialog(
+                                this,
+                                "Are you sure you want to logout?",
+                                "Confirm Logout",
+                                JOptionPane.YES_NO_OPTION);
 
-        // Temporary messages until these features are implemented.
-        bookTicketButton.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Ticket booking feature is coming soon.",
-                "Book Ticket",
-                JOptionPane.INFORMATION_MESSAGE));
+                if (choice == JOptionPane.YES_OPTION) {
 
-        trainDetailsButton.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Train details feature is coming soon.",
-                "Train Details",
-                JOptionPane.INFORMATION_MESSAGE));
+                        LoginFrame loginFrame = new LoginFrame();
+                        loginFrame.setVisible(true);
 
-        cancelReservationButton.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Reservation cancellation feature is coming soon.",
-                "Cancel Reservation",
-                JOptionPane.INFORMATION_MESSAGE));
-
-        logoutButton.addActionListener(e -> logout());
-    }
-
-    // Returns the user to the login screen.
-    private void logout() {
-
-        int choice = JOptionPane.showConfirmDialog(
-                this,
-                "Are you sure you want to logout?",
-                "Confirm Logout",
-                JOptionPane.YES_NO_OPTION);
-
-        if (choice == JOptionPane.YES_OPTION) {
-
-            LoginFrame loginFrame = new LoginFrame();
-            loginFrame.setVisible(true);
-
-            dispose();
+                        dispose();
+                }
         }
-    }
 }

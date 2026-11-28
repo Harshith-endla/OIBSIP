@@ -83,6 +83,13 @@ public class TrainScheduleService {
         return scheduleRepository.getAllSchedules();
     }
 
+    // Retrieve future schedules with available seats for ticket booking.
+    public List<TrainSchedule> getAvailableSchedulesForBooking()
+            throws SQLException {
+
+        return scheduleRepository.getAvailableSchedulesForBooking();
+    }
+
     // Retrieve a schedule by ID.
     public TrainSchedule getScheduleById(int scheduleId)
             throws SQLException {

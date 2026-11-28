@@ -62,6 +62,44 @@ public class TrainScheduleRepository {
         return schedules;
     }
 
+    // Retrieve future train schedules that have available seats for booking.
+    public List<TrainSchedule> getAvailableSchedulesForBooking()
+            throws SQLException {
+
+        List<TrainSchedule> schedules = new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    ts.schedule_id,
+                    ts.train_id,
+                    ts.journey_date,
+                    ts.departure_time,
+                    ts.arrival_time,
+                    ts.total_seats,
+                    ts.available_seats,
+                    ts.fare_per_seat,
+                    t.train_number,
+                    t.train_name
+                FROM Train_Schedules ts
+                INNER JOIN Trains t
+                    ON ts.train_id = t.train_id
+                WHERE ts.journey_date >= date('now', 'localtime')
+                  AND ts.available_seats > 0
+                ORDER BY ts.journey_date, ts.departure_time
+                """;
+
+        try (Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                schedules.add(mapSchedule(resultSet));
+            }
+        }
+
+        return schedules;
+    }
+
     // Find a schedule using its ID.
     public TrainSchedule getScheduleById(int scheduleId) throws SQLException {
 
