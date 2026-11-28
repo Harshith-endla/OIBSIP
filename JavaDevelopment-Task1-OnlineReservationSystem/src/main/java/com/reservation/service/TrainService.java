@@ -3,6 +3,7 @@ package com.reservation.service;
 
 import com.reservation.model.Train;
 import com.reservation.repository.TrainRepository;
+import com.reservation.util.ValidationUtil;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -107,10 +108,10 @@ public class TrainService {
             String source,
             String destination) {
 
-        if (isBlank(trainNumber)
-                || isBlank(trainName)
-                || isBlank(source)
-                || isBlank(destination)) {
+        if (ValidationUtil.isBlank(trainNumber)
+                || ValidationUtil.isBlank(trainName)
+                || ValidationUtil.isBlank(source)
+                || ValidationUtil.isBlank(destination)) {
 
             throw new IllegalArgumentException(
                     "All train details are required.");
@@ -121,9 +122,5 @@ public class TrainService {
             throw new IllegalArgumentException(
                     "Source and destination cannot be the same.");
         }
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }

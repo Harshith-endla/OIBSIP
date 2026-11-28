@@ -1,7 +1,9 @@
+
 package com.reservation.service;
 
 import com.reservation.model.User;
 import com.reservation.repository.UserRepository;
+import com.reservation.util.ValidationUtil;
 
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
@@ -67,10 +69,10 @@ public class AdminProvisioningService {
             return;
         }
 
-        if (isBlank(name)
-                || isBlank(email)
-                || isBlank(phone)
-                || isBlank(password)) {
+        if (ValidationUtil.isBlank(name)
+                || ValidationUtil.isBlank(email)
+                || ValidationUtil.isBlank(phone)
+                || ValidationUtil.isBlank(password)) {
 
             throw new IllegalStateException(
                     "Incomplete administrator configuration. "
@@ -109,9 +111,5 @@ public class AdminProvisioningService {
         } finally {
             Arrays.fill(adminPassword, '\0');
         }
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }

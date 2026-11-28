@@ -5,6 +5,7 @@ import com.reservation.model.Train;
 import com.reservation.model.TrainSchedule;
 import com.reservation.repository.TrainRepository;
 import com.reservation.repository.TrainScheduleRepository;
+import com.reservation.util.ValidationUtil;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -197,9 +198,9 @@ public class TrainScheduleService {
                     "Please select a valid train.");
         }
 
-        if (isBlank(journeyDate)
-                || isBlank(departureTime)
-                || isBlank(arrivalTime)) {
+        if (ValidationUtil.isBlank(journeyDate)
+                || ValidationUtil.isBlank(departureTime)
+                || ValidationUtil.isBlank(arrivalTime)) {
 
             throw new IllegalArgumentException(
                     "Journey date and both timings are required.");
@@ -240,9 +241,5 @@ public class TrainScheduleService {
             throw new IllegalArgumentException(
                     fieldName + " time must be in HH:mm format.");
         }
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }
